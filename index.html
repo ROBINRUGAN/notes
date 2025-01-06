@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Diary Management System</title>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar for categories -->
+      <aside class="sidebar">
+        <h2>笔记分类</h2>
+        <ul class="folder-list">
+          <li class="folder-item" data-folder="all">全部笔记</li>
+          <li class="folder-item" data-folder="work">未分类</li>
+          <li class="folder-item" data-folder="personal">
+            <p>工作</p>
+            <button class="edit-note-btn">✏️</button>
+            <button class="delete-note-btn">❌</button>
+          </li>
+          <li class="folder-item" data-folder="ideas">
+            <p>生活</p>
+            <button class="edit-note-btn">✏️</button>
+            <button class="delete-note-btn">❌</button>
+          </li>
+        </ul>
+        <button class="add-folder">+ 添加分类</button>
+      </aside>
+
+      <!-- Note List Section -->
+      <section class="note-list-section">
+        <header class="search-bar">
+          <input type="text" placeholder="搜索笔记..." />
+        </header>
+
+        <button class="add-note-btn">+ 添加笔记</button>
+        <ul class="notes">
+          <li class="note-item" data-note-id="1">
+            <p>笔记标题 1</p>
+            <button class="delete-note-btn">❌</button>
+          </li>
+          <li class="note-item" data-note-id="2">
+            <p>笔记标题 2</p>
+            <button class="delete-note-btn">❌</button>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Note Details Section -->
+      <section class="note-details-section">
+        <input class="note-title" value="笔记标题" />
+        <hr
+          style="
+            background-color: #ccc;
+            height: 1px;
+            border: none;
+            margin: 10px 0;
+          "
+        />
+        <textarea class="note-content">这里显示笔记的详细内容。</textarea>
+      </section>
+    </div>
+  </body>
+  <!-- 引入JavaScript文件 -->
+  <script src="DataService.js" defer></script>
+  <script src="NoteDetails.js" defer></script>
+  <script src="NoteList.js" defer></script>
+  <script src="Category.js" defer></script>
+</html>
