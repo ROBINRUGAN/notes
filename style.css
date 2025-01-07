@@ -20,7 +20,7 @@ body {
   background-color: #fff;
   margin-right: 10px;
   padding: 20px;
-  flex-grow: 1;
+  width: 250px;
   border-radius: 20px 0 0 20px;
 }
 
@@ -78,12 +78,13 @@ body {
 .note-list-section {
   background-color: #fff;
   padding: 20px;
-  flex-grow: 1;
+  width: 250px;
 }
 
 .search-bar {
   width: 100%;
   display: flex;
+  margin-bottom: 20px;
 }
 
 .search-bar input {
@@ -95,9 +96,7 @@ body {
 }
 
 .add-note-btn {
-  display: block;
   width: 45px;
-  height: 40px;
   margin-left: 10px;
   background-color: #007bff;
   color: #fff;
@@ -138,7 +137,7 @@ body {
 
 .note-details-section {
   margin-left: 10px;
-  flex-grow: 2;
+  flex-grow: 1;
   padding: 20px;
   background-color: #fff;
   border-radius: 0 20px 20px 0;
@@ -262,4 +261,263 @@ body {
 
 .sort-dropdown ul li:hover {
   background-color: #f0f0f0;
+}
+
+/* 父容器：标题上方布局 */
+.note-details-header {
+  display: flex;
+  justify-content: space-between; /* 左右两部分分开 */
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* 左侧时间信息 */
+.note-dates {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  color: #666;
+}
+
+.note-dates p {
+  margin: 2px 0;
+}
+
+/* 右侧按钮组 */
+.note-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 按钮或元素间隔 */
+}
+
+/* ============ 加密按钮 ============ */
+.encrypt-toggle-btn {
+  padding: 6px 12px;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.encrypt-toggle-btn:hover {
+  background-color: #0056b3;
+}
+
+.decrypt-toggle-btn {
+  padding: 6px 12px;
+  background-color: #dc3545;
+  color: #fff;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.decrypt-toggle-btn:hover {
+  background-color: #bd2130;
+}
+
+/* ============ 编辑模式开关 ============ */
+/* 通过左右文本 + 中间一个开关呈现 */
+.edit-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* 左中右之间的间隔 */
+  font-size: 14px;
+  color: #333;
+}
+
+.mode-label-left,
+.mode-label-right {
+  min-width: 60px; /* 让文本不会太挤，可根据需要调整 */
+  text-align: center;
+}
+
+/* switch外包一层，以便控制布局 */
+.switch-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 34px; /* switch总宽度 */
+  height: 20px; /* switch总高度 */
+}
+
+/* 隐藏原生checkbox */
+.edit-mode-checkbox {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+/* switch背景条 */
+.switch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 20px;
+  background-color: #ccc;
+  border-radius: 10px;
+  transition: background-color 0.3s;
+}
+
+/* switch上的圆 */
+.switch::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: #fff;
+  border-radius: 8px;
+  transition: transform 0.3s;
+}
+
+/* 勾选时：开关背景变蓝，圆点右移 */
+.edit-mode-checkbox:checked + .switch {
+  background-color: #007bff;
+}
+
+.edit-mode-checkbox:checked + .switch::after {
+  transform: translateX(14px);
+}
+
+/* ============ 导出下拉框 ============ */
+.export-dropdown-container {
+  position: relative;
+}
+
+/* 导出按钮 */
+.export-btn {
+  background-color: #007bff;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.export-btn:hover {
+  background-color: #0056b3;
+}
+
+/* 下拉框 */
+.export-dropdown {
+  position: absolute;
+  top: 36px; /* 让下拉框显示在按钮正下方 */
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  width: 150px;
+  border-radius: 5px;
+  z-index: 999;
+  padding: 8px 0;
+}
+
+/* 下拉列表样式：左对齐 */
+.export-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.export-dropdown ul li {
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  text-align: left; /* 强制左对齐 */
+}
+
+.export-dropdown ul li:hover {
+  background-color: #f0f0f0;
+}
+
+.hidden-encrypt-btn {
+  display: none !important;
+}
+
+.password-modal,
+.set-password-modal,
+.decrypt-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明遮罩 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.hidden-password-modal {
+  display: none !important;
+}
+
+.password-modal-content,
+.set-password-modal-content,
+.decrypt-modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 300px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.password-modal-content h3 {
+  margin-top: 0;
+}
+
+.password-input,
+.confirm-password-input,
+.decrypt-password-input {
+  display: block;
+  width: 95%;
+  margin-bottom: 20px;
+  padding: 6px;
+  font-size: 16px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.password-confirm-btn,
+.decrypt-confirm-btn {
+  background-color: #007bff;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.password-confirm-btn:hover,
+.decrypt-confirm-btn:hover {
+  background-color: #0056b3;
+}
+
+.password-cancel-btn,
+.decrypt-cancel-btn {
+  background-color: #dc3545;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.password-cancel-btn:hover,
+.decrypt-cancel-btn:hover {
+  background-color: #bd2130;
 }

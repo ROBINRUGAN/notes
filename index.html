@@ -68,10 +68,49 @@
 
       <!-- Note Details Section -->
       <section class="note-details-section">
-        <div class="note-meta">
-          <p>创建时间： <span class="note-create-time"></span></p>
-          <p>最后修改时间： <span class="note-last-modified"></span></p>
+        <!-- 标题上方：时间信息 + 按钮操作区 -->
+        <div class="note-details-header">
+          <div class="note-dates">
+            <p>创建时间： <span class="note-create-time"></span></p>
+            <p>最后修改： <span class="note-last-modified"></span></p>
+          </div>
+
+          <div class="note-actions">
+            <!-- 加密/解密按钮 -->
+            <button class="encrypt-toggle-btn">🔒 加密</button>
+            <button class="decrypt-toggle-btn">🔑 解密</button>
+
+            <!-- 编辑模式开关：Markdown编辑 | 开关 | 富文本编辑 -->
+            <div class="edit-mode-toggle">
+              <span class="mode-label-left">Markdown编辑</span>
+              <label class="switch-wrapper">
+                <input type="checkbox" class="edit-mode-checkbox" />
+                <span class="switch"></span>
+              </label>
+              <span class="mode-label-right">富文本编辑</span>
+            </div>
+
+            <!-- 导出按钮 + 下拉菜单 -->
+            <div class="export-dropdown-container">
+              <button class="export-btn">导出 ▾</button>
+              <div class="export-dropdown hidden">
+                <ul>
+                  <li data-export="pdf">导出 PDF</li>
+                  <li data-export="markdown">导出 Markdown</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <hr
+          style="
+            margin: 10px 0;
+            background-color: #ccc;
+            height: 1px;
+            border: none;
+          "
+        />
 
         <input class="note-title" value="笔记标题" />
         <hr
@@ -84,6 +123,53 @@
         />
         <textarea class="note-content">这里显示笔记的详细内容。</textarea>
       </section>
+
+      <!-- 自定义的密码输入对话框（初始隐藏） -->
+      <div class="password-modal hidden-password-modal">
+        <div class="password-modal-content">
+          <h3>请输入笔记密码</h3>
+          <input type="password" class="password-input" />
+          <div class="modal-buttons">
+            <button class="password-confirm-btn">确认</button>
+            <button class="password-cancel-btn">取消</button>
+          </div>
+        </div>
+      </div>
+      <!-- 设置加密密码的对话框（初始隐藏） -->
+      <div class="set-password-modal hidden-password-modal">
+        <div class="set-password-modal-content">
+          <h3>设置密码</h3>
+          <input
+            type="password"
+            class="password-input"
+            placeholder="请输入密码"
+          />
+          <input
+            type="password"
+            class="confirm-password-input"
+            placeholder="请再次输入密码"
+          />
+          <div class="modal-buttons">
+            <button class="password-confirm-btn">确认</button>
+            <button class="password-cancel-btn">取消</button>
+          </div>
+        </div>
+      </div>
+      <!-- 解密对话框 -->
+      <div class="decrypt-modal hidden-password-modal">
+        <div class="decrypt-modal-content">
+          <h3>解密操作</h3>
+          <input
+            type="password"
+            class="decrypt-password-input"
+            placeholder="请输入密码"
+          />
+          <div class="modal-buttons">
+            <button class="decrypt-confirm-btn">确认</button>
+            <button class="decrypt-cancel-btn">取消</button>
+          </div>
+        </div>
+      </div>
     </div>
   </body>
   <!-- 引入JavaScript文件 -->
@@ -91,4 +177,5 @@
   <script src="NoteDetails.js" defer></script>
   <script src="NoteList.js" defer></script>
   <script src="Category.js" defer></script>
+  <script src="Common.js" defer></script>
 </html>

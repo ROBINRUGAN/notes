@@ -1,6 +1,8 @@
 // NoteList.js - Handles note list management
 
 const NoteList = {
+  tempUnlockedNotes: {}, // 记录笔记是否在当前会话中已解锁
+
   // 新增：存储当前的排序方式
   currentSortOption: null, // e.g. 'createTime-asc' / 'title-desc' 等
   // 新增：存储当前的搜索关键字
@@ -46,7 +48,19 @@ const NoteList = {
       li.classList.add("note-item");
       li.setAttribute("data-note-id", note.id);
       li.setAttribute("draggable", "true"); // 允许拖拽
-      li.innerHTML = `<p>${note.title}</p><button class="delete-note-btn">❌</button>`;
+
+      // 如果加密，则在标题前面加上锁图标
+      let icon = "";
+      if (note.isEncrypted) {
+        // 判断 tempUnlockedNotes[noteId] 是否为 true
+        if (this.tempUnlockedNotes[note.id]) {
+          icon = "🔐 "; // 当前会话解锁
+        } else {
+          icon = "🔒 "; // 未解锁
+        }
+      }
+      li.innerHTML = `<p>${icon}${note.title}</p><button class="delete-note-btn">❌</button>`;
+
       noteList.appendChild(li);
 
       // 绑定拖拽事件
@@ -60,6 +74,8 @@ const NoteList = {
     if (noteCountEl) {
       noteCountEl.textContent = `共${notes.length}条笔记`;
     }
+
+    this.bindCategoryDropEvents();
   },
 
   bindDragEvents: function (noteItem) {
@@ -159,6 +175,117 @@ const NoteList = {
         this.applyFiltersAndRender();
       }
     });
+
+    const encryptBtn = document.querySelector(".encrypt-toggle-btn");
+    const decryptBtn = document.querySelector(".decrypt-toggle-btn");
+
+    encryptBtn.addEventListener("click", () => {
+      this.handleEncrypt();
+    });
+
+    decryptBtn.addEventListener("click", () => {
+      this.handleDecrypt();
+    });
+  },
+
+  async handleEncrypt() {
+    // 获取当前 focused 笔记
+    const noteItem = document.querySelector(".note-item.focused");
+    if (!noteItem) {
+      alert("请先选中一条笔记再进行加密操作。");
+      return;
+    }
+    const noteId = noteItem.getAttribute("data-note-id");
+    let note = DataService.getNoteById(noteId);
+    if (!note) return;
+
+    // 如果已经加密了，就不继续
+    if (note.isEncrypted) {
+      alert("当前笔记已加密。请解密后再操作。");
+      return;
+    }
+
+    // 弹出自定义弹窗，让用户同时输入两遍密码
+    const result = await showSetPasswordModal();
+    // 如果点击了取消 => result为 null
+    if (!result) {
+      return; // 放弃设置
+    }
+
+    const { pwd1, pwd2 } = result;
+    if (!pwd1 || !pwd2) {
+      alert("密码不能为空，加密操作取消。");
+      return;
+    }
+    if (pwd1 !== pwd2) {
+      alert("两次密码不一致，加密操作取消。");
+      return;
+    }
+
+    // 设置加密
+    note.isEncrypted = true;
+    note.password = pwd1;
+    DataService.updateNote(note);
+
+    // 隐藏详情页
+    const noteDetailsSection = document.querySelector(".note-details-section");
+    noteDetailsSection.classList.add("hidden");
+
+    // 重新渲染笔记列表 (加“🔒”或“🔐”)
+    this.applyFiltersAndRender();
+
+    alert("笔记已加密！");
+  },
+
+  async handleDecrypt() {
+    // 获取当前 focused 笔记
+    const noteItem = document.querySelector(".note-item.focused");
+    if (!noteItem) {
+      alert("请先选中一条笔记再进行解密操作。");
+      return;
+    }
+    const noteId = noteItem.getAttribute("data-note-id");
+    let note = DataService.getNoteById(noteId);
+    if (!note) return;
+
+    // 如果没加密就不处理
+    if (!note.isEncrypted) {
+      alert("当前笔记未加密。");
+      return;
+    }
+
+    // 弹出解密对话框...
+    const pwd = await showDecryptModal();
+    if (pwd === null) {
+      // 用户点了取消
+      return;
+    }
+
+    if (pwd !== note.password) {
+      alert("密码错误，无法解密。");
+      return;
+    }
+
+    // 解密成功
+    note.isEncrypted = false;
+    note.password = "";
+    DataService.updateNote(note);
+
+    // 重新渲染笔记列表
+    this.applyFiltersAndRender();
+
+    // =========== 让当前笔记重新获得 focused ===========
+    const newNoteItem = document.querySelector(
+      `.note-item[data-note-id="${noteId}"]`
+    );
+    if (newNoteItem) {
+      newNoteItem.classList.add("focused");
+    }
+
+    // 重新显示详情（此时已不加密）
+    this.renderNoteDetails(note);
+
+    alert("笔记已解密！");
   },
 
   // 统一调用此方法来“获取当前分类的笔记 -> 搜索过滤 -> 排序 -> render”
@@ -304,69 +431,112 @@ const NoteList = {
     }
   },
 
-  showNoteDetails: function (noteId) {
+  showNoteDetails: async function (noteId) {
     const note = DataService.getNoteById(noteId);
-    if (note) {
-      let noteTitleInput = document.querySelector(".note-title");
-      let noteContentInput = document.querySelector(".note-content");
-      const noteDetailsSection = document.querySelector(
-        ".note-details-section"
-      );
+    if (!note) return;
 
-      // 替换旧的 input 节点，绑定新的监听器 (你的原始逻辑)
-      let newTitleInput = noteTitleInput.cloneNode(true);
-      let newContentInput = noteContentInput.cloneNode(true);
-      noteTitleInput.replaceWith(newTitleInput);
-      noteContentInput.replaceWith(newContentInput);
+    if (note.isEncrypted) {
+      // 如果本会话中已经解锁过，就直接render
+      if (!this.tempUnlockedNotes[noteId]) {
+        // 否则要弹窗输入密码
+        while (true) {
+          const pwd = await showPasswordModal();
+          // 如果用户点击取消 => pwd 为 null
+          if (pwd === null) {
+            return; // 直接不显示详情
+          }
+          if (pwd === note.password) {
+            // 正确 => 标记临时解锁
+            this.tempUnlockedNotes[noteId] = true;
 
-      // 更新变量引用
-      noteTitleInput = newTitleInput;
-      noteContentInput = newContentInput;
-
-      // 显示笔记详情区域
-      noteDetailsSection.classList.remove("hidden");
-
-      // 设置当前笔记内容
-      noteTitleInput.value = note.title;
-      noteContentInput.value = note.content;
-
-      // ======= 新增：显示创建时间和最后修改时间 =======
-      const createTimeEl = document.querySelector(".note-create-time");
-      const lastModifiedEl = document.querySelector(".note-last-modified");
-      if (createTimeEl) {
-        createTimeEl.textContent = note.createTime
-          ? new Date(note.createTime).toLocaleString()
-          : "无";
+            this.renderNotes(DataService.getNotes());
+            const newNoteItem = document.querySelector(
+              `.note-item[data-note-id="${noteId}"]`
+            );
+            if (newNoteItem) {
+              newNoteItem.classList.add("focused");
+            }
+            break; // 跳出 while 循环
+          } else {
+            alert("密码错误，请重新输入或取消。");
+          }
+        }
       }
+    }
+
+    // 如果笔记未加密 或 本会话中已解锁 => 显示详情
+    this.renderNoteDetails(note);
+  },
+
+  renderNoteDetails(note) {
+    let noteTitleInput = document.querySelector(".note-title");
+    let noteContentInput = document.querySelector(".note-content");
+    const noteDetailsSection = document.querySelector(".note-details-section");
+
+    // 替换旧 input
+    let newTitleInput = noteTitleInput.cloneNode(true);
+    let newContentInput = noteContentInput.cloneNode(true);
+    noteTitleInput.replaceWith(newTitleInput);
+    noteContentInput.replaceWith(newContentInput);
+
+    noteTitleInput = newTitleInput;
+    noteContentInput = newContentInput;
+
+    // 显示笔记详情
+    noteDetailsSection.classList.remove("hidden");
+
+    // 设置当前笔记内容
+    noteTitleInput.value = note.title;
+    noteContentInput.value = note.content;
+
+    // ======= 显示时间 =======
+    const createTimeEl = document.querySelector(".note-create-time");
+    const lastModifiedEl = document.querySelector(".note-last-modified");
+    if (createTimeEl) {
+      createTimeEl.textContent = note.createTime
+        ? new Date(note.createTime).toLocaleString()
+        : "无";
+    }
+    if (lastModifiedEl) {
+      lastModifiedEl.textContent = note.lastModified
+        ? new Date(note.lastModified).toLocaleString()
+        : "无";
+    }
+
+    // ====== 监听编辑，实时更新 ======
+    noteTitleInput.addEventListener("input", () => {
+      note.title = noteTitleInput.value;
+      DataService.updateNote(note);
+      // 更新lastModified
       if (lastModifiedEl) {
-        lastModifiedEl.textContent = note.lastModified
-          ? new Date(note.lastModified).toLocaleString()
-          : "无";
+        lastModifiedEl.textContent = new Date(
+          note.lastModified
+        ).toLocaleString();
       }
+    });
 
-      // ====== 监听编辑，实时更新 ======
-      noteTitleInput.addEventListener("input", () => {
-        note.title = noteTitleInput.value;
-        DataService.updateNote(note);
-        // updateNote 会自动刷新 lastModified
-        // 如果想在输入标题时马上更新右侧显示，也可以再读一次 note.lastModified
-        if (lastModifiedEl) {
-          lastModifiedEl.textContent = new Date(
-            note.lastModified
-          ).toLocaleString();
-        }
-      });
+    noteContentInput.addEventListener("input", () => {
+      note.content = noteContentInput.value;
+      DataService.updateNote(note);
+      // 同理
+      if (lastModifiedEl) {
+        lastModifiedEl.textContent = new Date(
+          note.lastModified
+        ).toLocaleString();
+      }
+    });
 
-      noteContentInput.addEventListener("input", () => {
-        note.content = noteContentInput.value;
-        DataService.updateNote(note);
-        // 同理，更新 lastModified
-        if (lastModifiedEl) {
-          lastModifiedEl.textContent = new Date(
-            note.lastModified
-          ).toLocaleString();
-        }
-      });
+    // 根据笔记是否加密，动态显示 加密按钮/解密按钮
+    const encryptBtn = document.querySelector(".encrypt-toggle-btn");
+    const decryptBtn = document.querySelector(".decrypt-toggle-btn");
+    if (note.isEncrypted) {
+      // 显示“解密”按钮，隐藏“加密”按钮
+      encryptBtn.classList.add("hidden-encrypt-btn");
+      decryptBtn.classList.remove("hidden-encrypt-btn");
+    } else {
+      // 显示“加密”按钮，隐藏“解密”按钮
+      encryptBtn.classList.remove("hidden-encrypt-btn");
+      decryptBtn.classList.add("hidden-encrypt-btn");
     }
   },
 };

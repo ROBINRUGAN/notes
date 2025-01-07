@@ -47,11 +47,12 @@ const DataService = {
 
   addNote: function (note) {
     const notes = this.getNotes();
-    if (!note.createTime) {
-      note.createTime = Date.now();
+    // 如果外部没有指定 isEncrypted，就默认为 false
+    if (note.isEncrypted === undefined) {
+      note.isEncrypted = false;
     }
-    if (!note.lastModified) {
-      note.lastModified = Date.now();
+    if (!note.password) {
+      note.password = ""; // 默认没有密码
     }
     notes.push(note);
     localStorage.setItem("notes", JSON.stringify(notes));
@@ -79,7 +80,7 @@ const DataService = {
       if (note.id === updatedNote.id) {
         // 当我们更新笔记时，刷新 lastModified 字段
         updatedNote.lastModified = Date.now();
-        return updatedNote;
+        return { ...note, ...updatedNote };
       }
       return note;
     });
@@ -92,3 +93,41 @@ const DataService = {
     localStorage.setItem("notes", JSON.stringify(notes));
   },
 };
+
+function showPasswordModal() {
+  return new Promise((resolve, reject) => {
+    const modal = document.querySelector(".password-modal");
+    const input = document.querySelector(".password-input");
+    const confirmBtn = document.querySelector(".password-confirm-btn");
+    const cancelBtn = document.querySelector(".password-cancel-btn");
+
+    // 清空上一次的输入
+    input.value = "";
+
+    // 显示弹窗
+    modal.classList.remove("hidden-password-modal");
+
+    const handleConfirm = () => {
+      const pwd = input.value;
+      closeModal();
+      resolve(pwd);
+    };
+
+    const handleCancel = () => {
+      closeModal();
+      resolve(null);
+    };
+
+    function closeModal() {
+      modal.classList.add("hidden-password-modal");
+      confirmBtn.removeEventListener("click", handleConfirm);
+      cancelBtn.removeEventListener("click", handleCancel);
+    }
+
+    confirmBtn.addEventListener("click", handleConfirm);
+    cancelBtn.addEventListener("click", handleCancel);
+
+    // 让输入框获得焦点
+    input.focus();
+  });
+}
