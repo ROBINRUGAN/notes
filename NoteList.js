@@ -4,11 +4,13 @@ const NoteList = {
   init: function () {
     this.loadNotes();
     this.bindEvents();
+    this.bindCategoryDropEvents(); // 确保拖放事件在初始化时绑定
   },
 
   loadNotes: function () {
     const notes = DataService.getNotes();
     this.renderNotes(notes);
+    this.bindCategoryDropEvents(); // 每次更新列表时重新绑定
   },
 
   loadNotesByCategory: function (folderId) {
@@ -23,6 +25,7 @@ const NoteList = {
 
     this.renderNotes(filteredNotes);
     this.hideNoteDetails();
+    this.bindCategoryDropEvents(); // 确保分类项的拖放事件被绑定
   },
 
   hideNoteDetails: function () {
@@ -38,11 +41,70 @@ const NoteList = {
       const li = document.createElement("li");
       li.classList.add("note-item");
       li.setAttribute("data-note-id", note.id);
+      li.setAttribute("draggable", "true"); // 允许拖拽
       li.innerHTML = `<p>${note.title}</p><button class="delete-note-btn">❌</button>`;
       noteList.appendChild(li);
+
+      // 绑定拖拽事件
+      this.bindDragEvents(li);
     });
 
     this.bindNoteSelection();
+  },
+
+  bindDragEvents: function (noteItem) {
+    noteItem.addEventListener("dragstart", (event) => {
+      event.dataTransfer.setData(
+        "text/plain",
+        noteItem.getAttribute("data-note-id")
+      );
+    });
+  },
+
+  bindCategoryDropEvents: function () {
+    const folderItems = document.querySelectorAll(".folder-item");
+
+    folderItems.forEach((folder) => {
+      folder.addEventListener("dragover", (event) => {
+        event.preventDefault(); // 必须阻止默认行为，否则 drop 事件无法触发
+        folder.classList.add("drag-over");
+      });
+
+      folder.addEventListener("dragleave", () => {
+        folder.classList.remove("drag-over");
+      });
+
+      folder.addEventListener("drop", (event) => {
+        event.preventDefault();
+        folder.classList.remove("drag-over");
+
+        const noteId = event.dataTransfer.getData("text/plain");
+        const targetFolderId = folder.getAttribute("data-folder");
+
+        // 获取当前笔记的分类
+        const note = DataService.getNoteById(noteId);
+
+        folderItems.forEach((item) => item.classList.remove("focused"));
+        folder.classList.add("focused");
+
+        if (
+          !note ||
+          note.categoryId === targetFolderId ||
+          targetFolderId === "all"
+        ) {
+          // 刷新目标分类的笔记列表
+          this.loadNotesByCategory(targetFolderId);
+          console.log("Note is already in the same folder. No action taken.");
+          return;
+        }
+
+        // 更新笔记的分类
+        DataService.moveNoteToCategory(noteId, targetFolderId);
+
+        // 刷新目标分类的笔记列表
+        this.loadNotesByCategory(targetFolderId);
+      });
+    });
   },
 
   bindNoteSelection: function () {

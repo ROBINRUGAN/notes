@@ -51,6 +51,17 @@ const DataService = {
     localStorage.setItem("notes", JSON.stringify(notes));
   },
 
+  moveNoteToCategory: function (noteId, categoryId) {
+    let notes = this.getNotes();
+    notes = notes.map((note) => {
+      if (note.id === noteId) {
+        note.categoryId = categoryId;
+      }
+      return note;
+    });
+    localStorage.setItem("notes", JSON.stringify(notes));
+  },
+
   getNoteById: function (noteId) {
     const notes = this.getNotes();
     return notes.find((note) => note.id === noteId);

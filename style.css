@@ -93,18 +93,18 @@ body {
     padding: 10px;
     border: 1px dashed #ccc;
     border-radius: 5px;
-    margin-bottom: 20px;
 }
 
 .add-note-btn {
     display: block;
-    width: 100%;
-    padding: 10px;
+    width: 45px;
+    height: 40px;
+    margin-left: 10px;
     background-color: #007bff;
     color: #fff;
     border: none;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    font-size: 30px;
+    border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.3s;
 }
@@ -208,3 +208,8 @@ body {
 .hidden {
     visibility: hidden;
 }
+
+
+.drag-over {
+    background-color: #e0e0e0;
+  }
