@@ -3,7 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="common.css" />
+    <link rel="stylesheet" href="layout.css" />
+    <link rel="stylesheet" href="components.css" />
+    <link rel="stylesheet" href="modals.css" />
+    <link rel="stylesheet" href="themes.css" />
     <title>Diary Management System</title>
   </head>
   <body>
@@ -11,6 +15,20 @@
       <!-- Sidebar for categories -->
       <aside class="sidebar">
         <h2>笔记分类</h2>
+
+        <div class="theme-ctrl">
+          <label for="theme-select">选择主题:</label>
+          <select id="theme-select">
+            <option value="theme-blue" selected>清新蓝</option>
+            <option value="theme-dark">暗黑模式</option>
+            <option value="theme-yellow">明媚黄</option>
+            <option value="theme-purple">浪漫紫</option>
+            <option value="theme-green">清爽绿</option>
+          </select>
+          <!-- 月亮/太阳切换按钮 -->
+          <button id="mode-toggle-btn" class="mode-toggle-btn">🌙</button>
+        </div>
+
         <ul class="folder-list">
           <!-- <li class="folder-item" data-folder="all">全部笔记</li>
           <li class="folder-item" data-folder="work">未分类</li>

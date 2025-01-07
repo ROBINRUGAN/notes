@@ -154,3 +154,80 @@ function showDecryptModal() {
     pwdInput.focus();
   });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const themeSelect = document.getElementById("theme-select");
+  const modeToggleBtn = document.getElementById("mode-toggle-btn");
+
+  // 1. 读取 localStorage 中的上次主题
+  let savedTheme = localStorage.getItem("userTheme");
+
+  // 如果没有，则默认使用 “theme-blue”
+  if (!savedTheme) {
+    savedTheme = "theme-blue";
+    localStorage.setItem("userTheme", savedTheme);
+  }
+
+  // 2. 应用主题
+  applyTheme(savedTheme);
+
+  // 同步下拉框选项
+  themeSelect.value = savedTheme;
+
+  // 如果当前是 dark，就把按钮文字改成“🌞”，否则“🌙”
+  if (savedTheme === "theme-dark") {
+    modeToggleBtn.textContent = "🌞";
+  } else {
+    modeToggleBtn.textContent = "🌙";
+  }
+
+  // 3. 下拉框切换事件
+  themeSelect.addEventListener("change", (event) => {
+    const newTheme = event.target.value;
+    applyTheme(newTheme);
+
+    // 持久化存储
+    localStorage.setItem("userTheme", newTheme);
+
+    // 根据是否是暗黑模式，更新按钮图标
+    if (newTheme === "theme-dark") {
+      modeToggleBtn.textContent = "🌞";
+    } else {
+      modeToggleBtn.textContent = "🌙";
+    }
+  });
+
+  // 4. 月亮/太阳按钮点击
+  modeToggleBtn.addEventListener("click", () => {
+    const currentTheme = localStorage.getItem("userTheme") || "theme-blue";
+
+    if (currentTheme === "theme-dark") {
+      // 当前暗黑 => 切回蓝色
+      applyTheme("theme-blue");
+      localStorage.setItem("userTheme", "theme-blue");
+      themeSelect.value = "theme-blue";
+      modeToggleBtn.textContent = "🌙";
+    } else {
+      // 不管是不是蓝色，统一切到暗黑
+      applyTheme("theme-dark");
+      localStorage.setItem("userTheme", "theme-dark");
+      themeSelect.value = "theme-dark";
+      modeToggleBtn.textContent = "🌞";
+    }
+  });
+});
+
+/**
+ * 应用主题
+ * 先移除所有可能的主题类，再添加 newTheme
+ */
+function applyTheme(newTheme) {
+  document.body.classList.remove(
+    "theme-blue",
+    "theme-dark",
+    "theme-yellow",
+    "theme-purple",
+    "theme-green"
+  );
+  document.body.classList.add(newTheme);
+}
