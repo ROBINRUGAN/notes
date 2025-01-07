@@ -1,6 +1,11 @@
 // NoteList.js - Handles note list management
 
 const NoteList = {
+  // 新增：存储当前的排序方式
+  currentSortOption: null, // e.g. 'createTime-asc' / 'title-desc' 等
+  // 新增：存储当前的搜索关键字
+  currentSearchQuery: "",
+
   init: function () {
     this.loadNotes();
     this.bindEvents();
@@ -8,24 +13,23 @@ const NoteList = {
   },
 
   loadNotes: function () {
-    const notes = DataService.getNotes();
-    this.renderNotes(notes);
-    this.bindCategoryDropEvents(); // 每次更新列表时重新绑定
+    this.applyFiltersAndRender();
   },
 
   loadNotesByCategory: function (folderId) {
-    const notes = DataService.getNotes();
-    let filteredNotes;
+    // 改动：将当前分类设置为focused，然后直接调用 applyFiltersAndRender()
+    const folderItems = document.querySelectorAll(".folder-item");
+    folderItems.forEach((item) => {
+      if (item.getAttribute("data-folder") === folderId) {
+        item.classList.add("focused");
+      } else {
+        item.classList.remove("focused");
+      }
+    });
 
-    if (folderId === "all") {
-      filteredNotes = notes;
-    } else {
-      filteredNotes = notes.filter((note) => note.categoryId === folderId);
-    }
-
-    this.renderNotes(filteredNotes);
+    // 调用过滤 & 渲染
+    this.applyFiltersAndRender();
     this.hideNoteDetails();
-    this.bindCategoryDropEvents(); // 确保分类项的拖放事件被绑定
   },
 
   hideNoteDetails: function () {
@@ -50,6 +54,12 @@ const NoteList = {
     });
 
     this.bindNoteSelection();
+
+    // ======= 新增：更新笔记数量 =======
+    const noteCountEl = document.querySelector(".note-count");
+    if (noteCountEl) {
+      noteCountEl.textContent = `共${notes.length}条笔记`;
+    }
   },
 
   bindDragEvents: function (noteItem) {
@@ -125,16 +135,137 @@ const NoteList = {
     document
       .querySelector(".notes")
       .addEventListener("click", this.handleNoteClick.bind(this));
+
+    // 绑定搜索
+    const searchInput = document.querySelector(".search-bar input");
+    searchInput.addEventListener("input", this.handleSearch.bind(this));
+
+    // 新增：绑定排序按钮和下拉列表
+    const sortBtn = document.querySelector(".sort-btn");
+    const sortDropdown = document.querySelector(".sort-dropdown");
+
+    // 点击“排序”按钮，切换下拉框显示状态
+    sortBtn.addEventListener("click", () => {
+      sortDropdown.classList.toggle("hidden");
+    });
+
+    // 点击下拉框中的选项，设置 currentSortOption 并重新渲染
+    sortDropdown.addEventListener("click", (event) => {
+      if (event.target.tagName.toLowerCase() === "li") {
+        this.currentSortOption = event.target.getAttribute("data-sort");
+        // 隐藏下拉框
+        sortDropdown.classList.add("hidden");
+        // 重新渲染
+        this.applyFiltersAndRender();
+      }
+    });
   },
 
+  // 统一调用此方法来“获取当前分类的笔记 -> 搜索过滤 -> 排序 -> render”
+  applyFiltersAndRender: function () {
+    // 1. 获取当前焦点分类
+    const currentFolder = document.querySelector(".folder-item.focused");
+    const folderId = currentFolder
+      ? currentFolder.getAttribute("data-folder")
+      : "all";
+
+    // 2. 获取所有笔记
+    let notes = DataService.getNotes();
+
+    // 3. 按分类过滤
+    if (folderId !== "all") {
+      notes = notes.filter((note) => note.categoryId === folderId);
+    }
+
+    // 4. 搜索过滤
+    if (this.currentSearchQuery) {
+      const q = this.currentSearchQuery;
+      notes = notes.filter((note) => {
+        const titleMatch = note.title.toLowerCase().includes(q);
+        const contentMatch = note.content.toLowerCase().includes(q);
+        return titleMatch || contentMatch;
+      });
+    }
+
+    // 5. 排序
+    if (this.currentSortOption) {
+      notes = this.sortNotes(notes, this.currentSortOption);
+    }
+
+    // 6. 渲染笔记列表
+    this.renderNotes(notes);
+  },
+
+  // 排序函数
+  sortNotes: function (notes, sortOption) {
+    // sortOption 形如 "createTime-asc", "lastModified-desc", "title-asc" 等
+    const [key, order] = sortOption.split("-");
+    // key: createTime / lastModified / title
+    // order: asc / desc
+
+    // 注意：createTime / lastModified 为数值类型，title 是字符串
+    notes.sort((a, b) => {
+      let compareVal;
+      if (key === "title") {
+        // 字符串比较
+        compareVal = a.title.localeCompare(b.title);
+      } else {
+        // 时间戳数值比较
+        compareVal = a[key] - b[key];
+      }
+
+      // 如果是 'desc'，则反转 compareVal
+      return order === "asc" ? compareVal : -compareVal;
+    });
+
+    return notes;
+  },
+
+  handleSearch: function (event) {
+    const query = event.target.value.trim().toLowerCase();
+    this.searchNotes(query);
+  },
+
+  searchNotes: function (query) {
+    // 1. 获取当前选中的分类
+    const currentFolder = document.querySelector(".folder-item.focused");
+    const folderId = currentFolder
+      ? currentFolder.getAttribute("data-folder")
+      : "all";
+
+    // 2. 获取所有笔记
+    const notes = DataService.getNotes();
+
+    // 3. 如果当前分类不是"all"，先按分类过滤
+    let filteredNotes =
+      folderId === "all"
+        ? notes
+        : notes.filter((note) => note.categoryId === folderId);
+
+    // 4. 如果搜索关键词非空，再进行二次过滤（标题或内容包含关键字）
+    if (query) {
+      filteredNotes = filteredNotes.filter((note) => {
+        const titleMatch = note.title.includes(query);
+        const contentMatch = note.content.includes(query);
+        return titleMatch || contentMatch;
+      });
+    }
+
+    // 5. 重新渲染笔记列表
+    this.renderNotes(filteredNotes);
+
+    // 如果需要在搜索时隐藏右侧详情，可以根据需求做额外处理
+    this.hideNoteDetails();
+  },
+
+  // 其余函数如 addNote、handleNoteClick、showNoteDetails 等处
+  // 新建笔记时，为笔记自动加上 createTime / lastModified
   addNote: function () {
-    // 获取当前选中的分类
     const currentFolder = document.querySelector(".folder-item.focused");
     const categoryId = currentFolder
       ? currentFolder.getAttribute("data-folder")
       : "uncategorized";
 
-    // 输入新笔记标题
     const noteTitle = prompt("请输入笔记标题：");
     if (noteTitle) {
       const newNote = {
@@ -142,10 +273,12 @@ const NoteList = {
         title: noteTitle,
         content: "",
         categoryId: categoryId,
+        createTime: Date.now(),
+        lastModified: Date.now(),
       };
 
-      // 添加笔记到数据存储
       DataService.addNote(newNote);
+      // 添加完毕后，重新渲染
       this.loadNotesByCategory(categoryId);
 
       // 设置新建的笔记为 focused
@@ -176,11 +309,13 @@ const NoteList = {
     if (note) {
       let noteTitleInput = document.querySelector(".note-title");
       let noteContentInput = document.querySelector(".note-content");
+      const noteDetailsSection = document.querySelector(
+        ".note-details-section"
+      );
 
-      // 移除之前绑定的所有事件监听器
+      // 替换旧的 input 节点，绑定新的监听器 (你的原始逻辑)
       let newTitleInput = noteTitleInput.cloneNode(true);
       let newContentInput = noteContentInput.cloneNode(true);
-
       noteTitleInput.replaceWith(newTitleInput);
       noteContentInput.replaceWith(newContentInput);
 
@@ -188,25 +323,49 @@ const NoteList = {
       noteTitleInput = newTitleInput;
       noteContentInput = newContentInput;
 
+      // 显示笔记详情区域
+      noteDetailsSection.classList.remove("hidden");
+
       // 设置当前笔记内容
       noteTitleInput.value = note.title;
       noteContentInput.value = note.content;
 
-      // 显示笔记详情
-      const noteDetailsSection = document.querySelector(
-        ".note-details-section"
-      );
-      noteDetailsSection.classList.remove("hidden");
+      // ======= 新增：显示创建时间和最后修改时间 =======
+      const createTimeEl = document.querySelector(".note-create-time");
+      const lastModifiedEl = document.querySelector(".note-last-modified");
+      if (createTimeEl) {
+        createTimeEl.textContent = note.createTime
+          ? new Date(note.createTime).toLocaleString()
+          : "无";
+      }
+      if (lastModifiedEl) {
+        lastModifiedEl.textContent = note.lastModified
+          ? new Date(note.lastModified).toLocaleString()
+          : "无";
+      }
 
-      // 绑定新的事件监听器
+      // ====== 监听编辑，实时更新 ======
       noteTitleInput.addEventListener("input", () => {
         note.title = noteTitleInput.value;
         DataService.updateNote(note);
+        // updateNote 会自动刷新 lastModified
+        // 如果想在输入标题时马上更新右侧显示，也可以再读一次 note.lastModified
+        if (lastModifiedEl) {
+          lastModifiedEl.textContent = new Date(
+            note.lastModified
+          ).toLocaleString();
+        }
       });
 
       noteContentInput.addEventListener("input", () => {
         note.content = noteContentInput.value;
         DataService.updateNote(note);
+        // 同理，更新 lastModified
+        if (lastModifiedEl) {
+          lastModifiedEl.textContent = new Date(
+            note.lastModified
+          ).toLocaleString();
+        }
       });
     }
   },

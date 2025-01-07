@@ -47,6 +47,12 @@ const DataService = {
 
   addNote: function (note) {
     const notes = this.getNotes();
+    if (!note.createTime) {
+      note.createTime = Date.now();
+    }
+    if (!note.lastModified) {
+      note.lastModified = Date.now();
+    }
     notes.push(note);
     localStorage.setItem("notes", JSON.stringify(notes));
   },
@@ -69,9 +75,14 @@ const DataService = {
 
   updateNote: function (updatedNote) {
     let notes = this.getNotes();
-    notes = notes.map((note) =>
-      note.id === updatedNote.id ? updatedNote : note
-    );
+    notes = notes.map((note) => {
+      if (note.id === updatedNote.id) {
+        // 当我们更新笔记时，刷新 lastModified 字段
+        updatedNote.lastModified = Date.now();
+        return updatedNote;
+      }
+      return note;
+    });
     localStorage.setItem("notes", JSON.stringify(notes));
   },
 

@@ -36,6 +36,11 @@ const NoteDetails = {
       note.content = noteContent.value;
       DataService.updateNote(note);
     });
+    const lastModifiedEl = document.querySelector(".note-last-modified");
+    if (lastModifiedEl) {
+      const dateStr = new Date(note.lastModified).toLocaleString();
+      lastModifiedEl.textContent = dateStr;
+    }
   },
 };
 

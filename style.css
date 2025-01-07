@@ -1,215 +1,265 @@
-
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    height: 100vh;
-    background-color: #f9f9f9;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  height: 100vh;
+  background-color: #f9f9f9;
 }
 
 .app-container {
-    display: flex;
-    height: 95%;
-    width: 90%;
-    margin: auto;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border-radius: 20px;
+  display: flex;
+  height: 95%;
+  width: 90%;
+  margin: auto;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
 }
 
 .sidebar {
-    background-color: #fff;
-    margin-right: 10px;
-    padding: 20px;
-    flex-grow: 1;
-    border-radius: 20px 0 0 20px;
+  background-color: #fff;
+  margin-right: 10px;
+  padding: 20px;
+  flex-grow: 1;
+  border-radius: 20px 0 0 20px;
 }
 
 .sidebar h2 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    color: #333;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
 }
 
 .folder-list {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 .folder-item {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    color: #333;
-    display: flex;
-    transition: background-color 0.3s;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  color: #333;
+  display: flex;
+  transition: background-color 0.3s;
 }
 
 .folder-item .delete-note-btn {
-    margin-left: 0;
+  margin-left: 0;
 }
 
 .folder-item:hover {
-    background-color: #e0e0e0;
+  background-color: #e0e0e0;
 }
 
-.focused{
-    background-color: #e0e0e0;
+.focused {
+  background-color: #e0e0e0;
 }
 
 .add-folder {
-    margin-top: 10px;
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .add-folder:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .note-list-section {
-    background-color: #fff;
-    padding: 20px;
-    flex-grow: 1;
+  background-color: #fff;
+  padding: 20px;
+  flex-grow: 1;
 }
 
 .search-bar {
-    width: 100%;
-    display: flex;
+  width: 100%;
+  display: flex;
 }
 
 .search-bar input {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    border: 1px dashed #ccc;
-    border-radius: 5px;
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: 1px dashed #ccc;
+  border-radius: 5px;
 }
 
 .add-note-btn {
-    display: block;
-    width: 45px;
-    height: 40px;
-    margin-left: 10px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    font-size: 30px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 0.3s;
+  display: block;
+  width: 45px;
+  height: 40px;
+  margin-left: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  font-size: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .add-note-btn:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .notes {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 .note-item {
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: background-color 0.3s;
-    height: fit-content;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s;
+  height: fit-content;
 }
 
-.folder-item p, .note-item p{
-    margin: 0;
+.folder-item p,
+.note-item p {
+  margin: 0;
 }
 
 .note-item:hover {
-    background-color: #e0e0e0;
+  background-color: #e0e0e0;
 }
 
 .note-details-section {
-    margin-left: 10px;
-    flex-grow: 2;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 0 20px 20px 0;
-    display: flex;
-    flex-direction: column;
+  margin-left: 10px;
+  flex-grow: 2;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 0 20px 20px 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .note-actions {
-    text-align: end;
+  text-align: end;
 }
 
 .note-title {
-    font-size: 24px;
-    margin-top: 10px;
-    border-radius: 5px;
-    border: 0px solid #ccc;
-    outline: none;
-    color: #333;
-    font-weight: bold;
-
+  font-size: 24px;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: 0px solid #ccc;
+  outline: none;
+  color: #333;
+  font-weight: bold;
 }
 
 .note-content {
-    color: #333;
-    line-height: 26px;
-    height: 100%;
-    font-size: 16px;
-    border-radius: 5px;
-    resize: none;
-    border: none;
-    outline: none;
-    font-weight: 400;
+  color: #333;
+  line-height: 26px;
+  height: 100%;
+  font-size: 16px;
+  border-radius: 5px;
+  resize: none;
+  border: none;
+  outline: none;
+  font-weight: 400;
 }
 
-
-
 .edit-note-btn {
-    height:fit-content;
-    border: none;
-    margin-left: auto;
-    background-color: transparent;
-    color: #fff;
-    opacity: 0.1;
+  height: fit-content;
+  border: none;
+  margin-left: auto;
+  background-color: transparent;
+  color: #fff;
+  opacity: 0.1;
 }
 
 .edit-note-btn:hover {
-    cursor: pointer;
-    opacity: 1;
+  cursor: pointer;
+  opacity: 1;
 }
 
 .delete-note-btn {
-    height:fit-content;
-    border: none;
-    background-color: transparent;
-    color: #fff;
-    opacity: 0.1;
-    margin-left: auto;
+  height: fit-content;
+  border: none;
+  background-color: transparent;
+  color: #fff;
+  opacity: 0.1;
+  margin-left: auto;
 }
 
 .delete-note-btn:hover {
-    cursor: pointer;
-    opacity: 1;
+  cursor: pointer;
+  opacity: 1;
 }
-
-
 
 .hidden {
-    visibility: hidden;
+  visibility: hidden;
 }
 
-
 .drag-over {
-    background-color: #e0e0e0;
-  }
+  background-color: #e0e0e0;
+}
+
+.note-info-bar {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 或根据需求调整 */
+}
+
+.note-count {
+  font-weight: bold;
+  color: #333;
+}
+
+.sort-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.sort-btn {
+  background-color: #007bff;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+}
+
+.sort-btn:hover {
+  background-color: #0056b3;
+}
+
+.sort-dropdown {
+  position: absolute;
+  top: 36px; /* 让下拉框在按钮正下方 */
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  width: 180px;
+  border-radius: 5px;
+  z-index: 999; /* 确保浮在最上方 */
+}
+
+.sort-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sort-dropdown ul li {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.sort-dropdown ul li:hover {
+  background-color: #f0f0f0;
+}

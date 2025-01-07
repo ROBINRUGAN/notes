@@ -35,6 +35,25 @@
           <button class="add-note-btn">+</button>
         </header>
 
+        <!-- 新增：统计和排序容器 -->
+        <div class="note-info-bar">
+          <span class="note-count">共0条笔记</span>
+          <div class="sort-dropdown-container">
+            <button class="sort-btn">排序 ▾</button>
+            <!-- 下拉框，默认隐藏，在点击 sort-btn 时切换显示/隐藏 -->
+            <div class="sort-dropdown hidden">
+              <ul>
+                <li data-sort="createTime-asc">按创建时间 (正序)</li>
+                <li data-sort="createTime-desc">按创建时间 (倒序)</li>
+                <li data-sort="lastModified-asc">按修改时间 (正序)</li>
+                <li data-sort="lastModified-desc">按修改时间 (倒序)</li>
+                <li data-sort="title-asc">按标题 (正序)</li>
+                <li data-sort="title-desc">按标题 (倒序)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         <ul class="notes">
           <!-- <li class="note-item" data-note-id="1">
             <p>笔记标题 1</p>
@@ -49,6 +68,11 @@
 
       <!-- Note Details Section -->
       <section class="note-details-section">
+        <div class="note-meta">
+          <p>创建时间： <span class="note-create-time"></span></p>
+          <p>最后修改时间： <span class="note-last-modified"></span></p>
+        </div>
+
         <input class="note-title" value="笔记标题" />
         <hr
           style="
