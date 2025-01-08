@@ -81,7 +81,8 @@
 }
 
 .add-note-btn {
-  width: 45px;
+  flex-shrink: 0;
+  width: 37.5px;
   margin-left: 10px;
   background-color: #007bff;
   color: #fff;
@@ -390,5 +391,6 @@
 
 #editorContainer {
   height: 100%;
+  width: 100%;
   overflow: scroll;
 }

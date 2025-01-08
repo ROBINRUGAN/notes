@@ -97,7 +97,7 @@ function showSetPasswordModal() {
     confirmBtn.addEventListener("click", handleConfirm);
     cancelBtn.addEventListener("click", handleCancel);
     pwdInput.addEventListener("keydown", handleKeydown);
-
+    confirmInput.addEventListener("keydown", handleKeydown);
     // 让第一个密码框获得焦点
     pwdInput.focus();
   });

@@ -67,9 +67,12 @@ body,
 button,
 .add-folder,
 .sort-btn,
+#logoutBtn,
 .add-note-btn,
 .encrypt-toggle-btn,
 .mode-toggle-btn,
+.password-confirm-btn,
+.encrypt-confirm-btn,
 .export-btn {
   background-color: var(--primary-color);
   color: #fff; /* 始终白字 */

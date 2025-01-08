@@ -1,6 +1,40 @@
+/* 顶部导航条样式 */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* 右侧对齐 */
+
+  background-color: var(--bg-color);
+  margin: 10px auto;
+  width: 90%;
+  border-radius: 0 0 10px 10px;
+}
+
+/* 显示当前用户姓名 */
+#userGreeting {
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* 退出登录按钮 */
+#logoutBtn {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#logoutBtn:hover {
+  background-color: var(--primary-hover-color);
+}
+
 .app-container {
   display: flex;
-  height: 95%;
+  height: 85%;
   width: 90%;
   margin: auto;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -11,14 +45,16 @@
   background-color: #fff;
   margin-right: 10px;
   padding: 20px;
-  width: 250px;
+  width: 220px;
   border-radius: 20px 0 0 20px;
+  flex-shrink: 0;
 }
 
 .note-list-section {
   background-color: #fff;
   padding: 20px;
-  width: 250px;
+  width: 220px;
+  flex-shrink: 0;
 }
 
 .note-details-section {

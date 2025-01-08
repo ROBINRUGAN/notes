@@ -142,4 +142,38 @@ const CloudDataService = {
 
     return await res.json(); // {success:true, url:xxx}
   },
+
+  async login(username, password) {
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("password", password);
+
+    const res = await fetch("/api.php?action=login", {
+      method: "POST",
+      body: formData,
+    });
+    return await res.json(); // {success:true, msg:"", ...}
+  },
+
+  async register(username, password) {
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("password", password);
+
+    const res = await fetch("/api.php?action=register", {
+      method: "POST",
+      body: formData,
+    });
+    return await res.json(); // {success:true, msg:"", ...}
+  },
+
+  async checkSession() {
+    const res = await fetch("/api.php?action=checkSession");
+    return await res.json(); // {loggedIn:true/false}
+  },
+
+  async logout() {
+    const res = await fetch("/api.php?action=logout");
+    return await res.json(); // {success:true}
+  },
 };
