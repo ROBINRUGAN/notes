@@ -20,24 +20,28 @@
 .password-modal-content,
 .set-password-modal-content,
 .decrypt-modal-content {
-  background-color: #fff;
+  background-color: var(--secondary-color);
   padding: 20px;
   border-radius: 10px;
   min-width: 300px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-.password-modal-content h3 {
-  margin-top: 0;
+.password-modal-content h3,
+.set-password-modal-content h3,
+.decrypt-modal-content h3 {
+  margin-top: 5px;
 }
 
 .password-input,
 .confirm-password-input,
 .decrypt-password-input {
   display: block;
-  width: 95%;
+  width: 90%;
   margin-bottom: 20px;
-  padding: 6px;
+  padding: 6px 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
   font-size: 16px;
 }
 

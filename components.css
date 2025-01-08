@@ -188,7 +188,7 @@
   position: absolute;
   top: 36px; /* 让下拉框在按钮正下方 */
   right: 0;
-  background-color: #fff;
+  background-color: var(--secondary-color);
   border: 1px solid #ddd;
   width: 180px;
   border-radius: 5px;
@@ -207,7 +207,7 @@
 }
 
 .sort-dropdown ul li:hover {
-  background-color: #f0f0f0;
+  background-color: var(--third-color);
 }
 /* ============ 加密按钮 ============ */
 .encrypt-toggle-btn {

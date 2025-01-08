@@ -1,12 +1,12 @@
 /* themes.css */
 
-/* 全局默认变量（可选） */
 :root {
   --bg-color: #ffffff;
   --text-color: #333333;
   --primary-color: #007bff;
   --secondary-color: #ffffff;
   --third-color: #cccccc;
+  --primary-hover-color: #0056b3;
 }
 
 /* 蓝色主题（默认） */
@@ -16,6 +16,7 @@
   --primary-color: #007bff;
   --secondary-color: #ffffff;
   --third-color: #cccccc;
+  --primary-hover-color: #0056b3;
 }
 
 /* 暗黑主题（改进：几乎全黑 + 白字） */
@@ -25,6 +26,7 @@
   --primary-color: #113d61;
   --secondary-color: #5f5f5f;
   --third-color: #333333;
+  --primary-hover-color: #0a2c4e;
 }
 
 /* 黄色主题 */
@@ -33,6 +35,7 @@
   --text-color: #333333;
   --primary-color: #ffc107;
   --secondary-color: #ffffff;
+  --primary-hover-color: #e0a800;
 }
 
 /* 紫色主题 */
@@ -41,6 +44,7 @@
   --text-color: #3c2a4d;
   --primary-color: #6f42c1;
   --secondary-color: #ffffff;
+  --primary-hover-color: #5a32a3;
 }
 
 /* 绿色主题 */
@@ -49,6 +53,7 @@
   --text-color: #2e5e3c;
   --primary-color: #28a745;
   --secondary-color: #ffffff;
+  --primary-hover-color: #218838;
 }
 
 /* 通用应用 */
@@ -68,6 +73,15 @@ button,
 .export-btn {
   background-color: var(--primary-color);
   color: #fff; /* 始终白字 */
+}
+
+.add-folder:hover,
+.sort-btn:hover,
+.add-note-btn:hover,
+.encrypt-toggle-btn:hover,
+.mode-toggle-btn:hover,
+.export-btn:hover {
+  background-color: var(--primary-hover-color);
 }
 
 .focused,
