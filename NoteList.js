@@ -257,6 +257,72 @@ const NoteList = {
       link.click();
 
       URL.revokeObjectURL(url);
+    } else if (exportType === "pdf-link") {
+      const hiddenDiv = document.createElement("div");
+      hiddenDiv.innerHTML = `
+        <h2 style="margin-bottom: 10px;">${note.title}</h2>
+        <div>${note.content || ""}</div>
+      `;
+
+      const opt = {
+        margin: 24, // PDF 边距
+        filename: safeTitle + ".pdf", // 导出的文件名
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 }, // 放大倍数
+        jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
+      };
+      // 1. 把对应的pdf文件保存到相对路径 ../assets/下面，因为我到时候是部署到服务器的，然后这个地方其实就是我文件的存储位置
+      // 2. 接着，保存完后，直接制作一个字符串，也就是我的url，格式就是https://file.mewtopia.cn/assets/filename.pdf
+      // 3. 把这个链接复制到剪切板，以及alert文字提示说“链接已生成，已复制到剪切板。”
+
+      html2pdf()
+        .set(opt)
+        .from(hiddenDiv)
+        .outputPdf("blob")
+        .then(function (pdfBlob) {
+          CloudDataService.uploadFile(pdfBlob, `${safeTitle}.pdf`)
+            .then((data) => {
+              if (data.success) {
+                const url = data.url;
+                navigator.clipboard.writeText(url).then(
+                  function () {
+                    alert("链接已生成，已复制到剪切板。");
+                  },
+                  function (err) {
+                    console.error("无法复制到剪切板: ", err);
+                  }
+                );
+              } else {
+                console.error("上传失败: ", data.error);
+              }
+            })
+            .catch((error) => {
+              console.error("上传失败: ", error);
+            });
+        });
+    } else if (exportType === "markdown-link") {
+      const markdownContent = `# ${note.title}\n\n${note.content || ""}`;
+
+      const blob = new Blob([markdownContent], { type: "text/markdown" });
+      CloudDataService.uploadFile(blob, `${safeTitle}.md`)
+        .then((data) => {
+          if (data.success) {
+            const url = data.url;
+            navigator.clipboard.writeText(url).then(
+              function () {
+                alert("链接已生成，已复制到剪切板。");
+              },
+              function (err) {
+                console.error("无法复制到剪切板: ", err);
+              }
+            );
+          } else {
+            console.error("上传失败: ", data.error);
+          }
+        })
+        .catch((error) => {
+          console.error("上传失败: ", error);
+        });
     }
   },
 

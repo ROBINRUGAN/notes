@@ -210,11 +210,19 @@
             <div class="export-dropdown-container">
               <!-- 新增 data-i18n-key -->
               <button class="export-btn" data-i18n-key="btn.export">
-                导出 ▾
+                分享 ▾
               </button>
               <div class="export-dropdown hidden">
                 <ul>
-                  <!-- 这两个也翻译 -->
+                  <li data-export="pdf-link" data-i18n-key="export.pdfLink">
+                    复制 PDF链接
+                  </li>
+                  <li
+                    data-export="markdown-link"
+                    data-i18n-key="export.markdownLink"
+                  >
+                    复制 Markdown链接
+                  </li>
                   <li data-export="pdf" data-i18n-key="export.pdf">导出 PDF</li>
                   <li data-export="markdown" data-i18n-key="export.markdown">
                     导出 Markdown
@@ -320,6 +328,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/simplemde@1.11.2/dist/simplemde.min.js"
       defer

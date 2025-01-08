@@ -74,6 +74,9 @@ switch($action) {
   case 'permanentlyDeleteNote':
     permanentlyDeleteNote($pdo);
     break;
+  case 'uploadFile':
+    uploadFile();
+    break;
 
   default:
     echo json_encode(['error' => 'Invalid action']);
@@ -255,5 +258,32 @@ function permanentlyDeleteNote($pdo) {
   $stmt = $pdo->prepare("DELETE FROM notes WHERE id=?");
   $stmt->execute([$noteId]);
   echo json_encode(['success'=>true]);
+}
+
+function uploadFile() {
+  if (!isset($_FILES['file'])) {
+    echo json_encode(['error' => 'No file uploaded']);
+    return;
+  }
+
+  $file = $_FILES['file'];
+  $uploadDir = __DIR__ . '/../assets/';
+  $uploadFile = $uploadDir . basename($file['name']);
+
+  // 调试信息
+  error_log("Upload directory: " . $uploadDir);
+  error_log("Upload file path: " . $uploadFile);
+  error_log("File tmp name: " . $file['tmp_name']);
+  error_log("File name: " . $file['name']);
+  error_log("File size: " . $file['size']);
+  error_log("File error: " . $file['error']);
+
+  if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
+    $url = 'https://file.mewtopia.cn/assets/' . basename($file['name']);
+    echo json_encode(['success' => true, 'url' => $url]);
+  } else {
+    echo json_encode(['error' => 'File upload failed']);
+    error_log("File upload failed");
+  }
 }
 ?>

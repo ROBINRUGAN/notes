@@ -130,4 +130,16 @@ const CloudDataService = {
     });
     return await res.json();
   },
+
+  async uploadFile(file, filename) {
+    const formData = new FormData();
+    formData.append("file", file, filename);
+
+    const res = await fetch("/api.php?action=uploadFile", {
+      method: "POST",
+      body: formData,
+    });
+
+    return await res.json(); // {success:true, url:xxx}
+  },
 };
