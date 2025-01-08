@@ -92,42 +92,45 @@ const DataService = {
     notes = notes.filter((note) => note.id !== noteId);
     localStorage.setItem("notes", JSON.stringify(notes));
   },
+
+  // 把笔记移动到垃圾箱
+  moveNoteToTrash: function (noteId) {
+    let notes = this.getNotes();
+    notes = notes.map((note) => {
+      if (note.id === noteId) {
+        // 记录原分类
+        note.previousCategoryId = note.categoryId;
+        // 设置当前分类为 "trash"
+        note.categoryId = "trash";
+      }
+      return note;
+    });
+    localStorage.setItem("notes", JSON.stringify(notes));
+  },
+
+  // 从垃圾箱还原笔记
+  restoreNoteFromTrash: function (noteId) {
+    let notes = this.getNotes();
+    notes = notes.map((note) => {
+      if (note.id === noteId && note.categoryId === "trash") {
+        // 还原回原分类
+        if (note.previousCategoryId) {
+          note.categoryId = note.previousCategoryId;
+        } else {
+          // 如果没有记录，就还原到 "uncategorized" 或其它
+          note.categoryId = "uncategorized";
+        }
+        note.previousCategoryId = ""; // 清空原分类记录
+      }
+      return note;
+    });
+    localStorage.setItem("notes", JSON.stringify(notes));
+  },
+
+  // 真正删除笔记
+  permanentlyDeleteNote: function (noteId) {
+    let notes = this.getNotes();
+    notes = notes.filter((note) => note.id !== noteId);
+    localStorage.setItem("notes", JSON.stringify(notes));
+  },
 };
-
-function showPasswordModal() {
-  return new Promise((resolve, reject) => {
-    const modal = document.querySelector(".password-modal");
-    const input = document.querySelector(".password-input");
-    const confirmBtn = document.querySelector(".password-confirm-btn");
-    const cancelBtn = document.querySelector(".password-cancel-btn");
-
-    // 清空上一次的输入
-    input.value = "";
-
-    // 显示弹窗
-    modal.classList.remove("hidden-password-modal");
-
-    const handleConfirm = () => {
-      const pwd = input.value;
-      closeModal();
-      resolve(pwd);
-    };
-
-    const handleCancel = () => {
-      closeModal();
-      resolve(null);
-    };
-
-    function closeModal() {
-      modal.classList.add("hidden-password-modal");
-      confirmBtn.removeEventListener("click", handleConfirm);
-      cancelBtn.removeEventListener("click", handleCancel);
-    }
-
-    confirmBtn.addEventListener("click", handleConfirm);
-    cancelBtn.addEventListener("click", handleCancel);
-
-    // 让输入框获得焦点
-    input.focus();
-  });
-}

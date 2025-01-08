@@ -16,6 +16,7 @@ const Category = {
     const defaultCategories = [
       { id: "all", name: "全部笔记" },
       { id: "uncategorized", name: "未分类" },
+      { id: "trash", name: "回收站" },
     ];
 
     defaultCategories.forEach((category) => {

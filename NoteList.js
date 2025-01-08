@@ -43,6 +43,13 @@ const NoteList = {
     const noteList = document.querySelector(".notes");
     noteList.innerHTML = "";
 
+    // 判断当前分类是否是垃圾箱
+    const currentFolder = document.querySelector(".folder-item.focused");
+    const folderId = currentFolder
+      ? currentFolder.getAttribute("data-folder")
+      : "all";
+    const isTrash = folderId === "trash";
+
     notes.forEach((note) => {
       const li = document.createElement("li");
       li.classList.add("note-item");
@@ -61,14 +68,17 @@ const NoteList = {
       }
       li.innerHTML = `<p>${icon}${note.title}</p><button class="delete-note-btn">❌</button>`;
 
+      // 如果不是垃圾箱笔记，用“删除”按钮
+      // 如果是垃圾箱笔记，用“彻底删除”+“还原”按钮
+      if (isTrash) {
+        li.innerHTML = `<p>${icon}${note.title}</p><button class="perm-delete-note-btn">❌</button><button class="restore-note-btn">↩️</button> `;
+      }
+
       noteList.appendChild(li);
 
       // 绑定拖拽事件
       this.bindDragEvents(li);
     });
-
-    this.bindNoteSelection();
-
     // ======= 新增：更新笔记数量 =======
     const noteCountEl = document.querySelector(".note-count");
     if (noteCountEl) {
@@ -133,45 +143,44 @@ const NoteList = {
     });
   },
 
-  bindNoteSelection: function () {
-    const noteItems = document.querySelectorAll(".note-item");
-    noteItems.forEach((item) => {
-      item.addEventListener("click", (event) => {
-        noteItems.forEach((item) => item.classList.remove("focused"));
-        event.currentTarget.classList.add("focused");
-        this.showNoteDetails(event.currentTarget.getAttribute("data-note-id"));
-      });
-    });
-  },
+  // ========= 关键：对每个 .note-item 都加点击事件 -> 显示详情 =========
+  // bindNoteSelection: function () {
+  //   const noteItems = document.querySelectorAll(".note-item");
+  //   noteItems.forEach((item) => {
+  //     item.addEventListener("click", (event) => {
+  //       // 先把其他 note-item 的 focused 去掉
+  //       noteItems.forEach((i) => i.classList.remove("focused"));
+  //       // 给当前点击的 note-item 添加 focused
+  //       event.currentTarget.classList.add("focused");
+  //       // 显示笔记详情
+  //       this.showNoteDetails(event.currentTarget.getAttribute("data-note-id"));
+  //     });
+  //   });
+  // },
 
   bindEvents: function () {
     document
       .querySelector(".add-note-btn")
       .addEventListener("click", this.addNote.bind(this));
-    document
-      .querySelector(".notes")
-      .addEventListener("click", this.handleNoteClick.bind(this));
 
-    // 绑定搜索
+    // 2) 在 .notes 容器上事件委托
+    const notesContainer = document.querySelector(".notes");
+    notesContainer.addEventListener("click", this.handleNotesClick.bind(this));
+
     const searchInput = document.querySelector(".search-bar input");
     searchInput.addEventListener("input", this.handleSearch.bind(this));
 
-    // 新增：绑定排序按钮和下拉列表
     const sortBtn = document.querySelector(".sort-btn");
     const sortDropdown = document.querySelector(".sort-dropdown");
 
-    // 点击“排序”按钮，切换下拉框显示状态
     sortBtn.addEventListener("click", () => {
       sortDropdown.classList.toggle("hidden");
     });
 
-    // 点击下拉框中的选项，设置 currentSortOption 并重新渲染
     sortDropdown.addEventListener("click", (event) => {
       if (event.target.tagName.toLowerCase() === "li") {
         this.currentSortOption = event.target.getAttribute("data-sort");
-        // 隐藏下拉框
         sortDropdown.classList.add("hidden");
-        // 重新渲染
         this.applyFiltersAndRender();
       }
     });
@@ -182,10 +191,64 @@ const NoteList = {
     encryptBtn.addEventListener("click", () => {
       this.handleEncrypt();
     });
-
     decryptBtn.addEventListener("click", () => {
       this.handleDecrypt();
     });
+  },
+
+  handleNotesClick: function (event) {
+    const noteItem = event.target.closest(".note-item");
+    if (!noteItem) return; // 点到空白，不做事
+
+    const noteId = noteItem.getAttribute("data-note-id");
+    if (!noteId) return;
+
+    // 1) 如果是删除按钮
+    if (event.target.classList.contains("delete-note-btn")) {
+      event.stopPropagation();
+      event.preventDefault();
+      const confirmDelete = confirm("确定要删除该笔记吗？将移动到垃圾箱。");
+      if (confirmDelete) {
+        DataService.moveNoteToTrash(noteId);
+        this.loadNotes();
+      }
+      return;
+    }
+
+    // 2) 如果是彻底删除
+    if (event.target.classList.contains("perm-delete-note-btn")) {
+      event.stopPropagation();
+      event.preventDefault();
+      const confirmPermDelete = confirm("此操作不可恢复，确定要彻底删除吗？");
+      if (confirmPermDelete) {
+        DataService.permanentlyDeleteNote(noteId);
+        this.loadNotes();
+      }
+      return;
+    }
+
+    // 3) 如果是还原
+    if (event.target.classList.contains("restore-note-btn")) {
+      event.stopPropagation();
+      event.preventDefault();
+      const confirmRestore = confirm("确认要还原此笔记吗？");
+      if (confirmRestore) {
+        DataService.restoreNoteFromTrash(noteId);
+        this.loadNotes();
+      }
+      return;
+    }
+
+    // 4) 如果点击的既不是删除/彻底删除/还原 => 显示笔记详情
+    //    (说明点到了 note-item 的其他地方，比如标题p)
+    //    => 不要阻止冒泡 => 继续处理
+    // 先让当前 noteItem focused
+    // 取消其他 .note-item 的 focused
+    const allItems = document.querySelectorAll(".note-item");
+    allItems.forEach((i) => i.classList.remove("focused"));
+    noteItem.classList.add("focused");
+
+    this.showNoteDetails(noteId);
   },
 
   async handleEncrypt() {
@@ -300,7 +363,11 @@ const NoteList = {
     let notes = DataService.getNotes();
 
     // 3. 按分类过滤
-    if (folderId !== "all") {
+    if (folderId === "all") {
+      // 排除垃圾箱
+      notes = notes.filter((note) => note.categoryId !== "trash");
+    } else {
+      // 只显示该分类
       notes = notes.filter((note) => note.categoryId === folderId);
     }
 
@@ -325,23 +392,14 @@ const NoteList = {
 
   // 排序函数
   sortNotes: function (notes, sortOption) {
-    // sortOption 形如 "createTime-asc", "lastModified-desc", "title-asc" 等
     const [key, order] = sortOption.split("-");
-    // key: createTime / lastModified / title
-    // order: asc / desc
-
-    // 注意：createTime / lastModified 为数值类型，title 是字符串
     notes.sort((a, b) => {
       let compareVal;
       if (key === "title") {
-        // 字符串比较
         compareVal = a.title.localeCompare(b.title);
       } else {
-        // 时间戳数值比较
         compareVal = a[key] - b[key];
       }
-
-      // 如果是 'desc'，则反转 compareVal
       return order === "asc" ? compareVal : -compareVal;
     });
 
@@ -418,16 +476,6 @@ const NoteList = {
           this.showNoteDetails(newNote.id);
         }
       }, 100);
-    }
-  },
-
-  handleNoteClick: function (event) {
-    if (event.target.classList.contains("delete-note-btn")) {
-      const noteId = event.target
-        .closest(".note-item")
-        .getAttribute("data-note-id");
-      DataService.deleteNote(noteId);
-      this.loadNotes();
     }
   },
 

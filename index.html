@@ -3,85 +3,126 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 拆分后的CSS文件 -->
     <link rel="stylesheet" href="common.css" />
     <link rel="stylesheet" href="layout.css" />
     <link rel="stylesheet" href="components.css" />
     <link rel="stylesheet" href="modals.css" />
     <link rel="stylesheet" href="themes.css" />
-    <title>Diary Management System</title>
+    <title>哈你笔记 - HoneyNotes</title>
   </head>
   <body>
     <div class="app-container">
       <!-- Sidebar for categories -->
       <aside class="sidebar">
-        <h2>笔记分类</h2>
+        <!-- 新增 data-i18n-key -->
+        <h2 data-i18n-key="title.noteCategory">笔记分类</h2>
+
+        <!-- 语言切换下拉框 -->
 
         <div class="theme-ctrl">
-          <label for="theme-select">选择主题:</label>
-          <select id="theme-select">
-            <option value="theme-blue" selected>清新蓝</option>
-            <option value="theme-dark">暗黑模式</option>
-            <option value="theme-yellow">明媚黄</option>
-            <option value="theme-purple">浪漫紫</option>
-            <option value="theme-green">清爽绿</option>
+          <!-- 新增 data-i18n-key -->
+          <select id="lang-select">
+            <option value="zh">简体中文</option>
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+            <option value="fr">Français</option>
           </select>
-          <!-- 月亮/太阳切换按钮 -->
+          <select id="theme-select">
+            <!-- 下拉框的文本也可能需要翻译 -->
+            <!-- 可以先写中文，然后用 data-i18n-key，如果想要更进一步，可动态生成 option -->
+            <option
+              value="theme-blue"
+              selected
+              data-i18n-key="option.blue"
+            ></option>
+            清新蓝
+            <option value="theme-dark" data-i18n-key="option.dark">
+              暗黑模式
+            </option>
+            <option value="theme-yellow" data-i18n-key="option.yellow">
+              明媚黄
+            </option>
+            <option value="theme-purple" data-i18n-key="option.purple">
+              浪漫紫
+            </option>
+            <option value="theme-green" data-i18n-key="option.green">
+              清爽绿
+            </option>
+          </select>
           <button id="mode-toggle-btn" class="mode-toggle-btn">🌙</button>
         </div>
 
-        <ul class="folder-list">
-          <!-- <li class="folder-item" data-folder="all">全部笔记</li>
-          <li class="folder-item" data-folder="work">未分类</li>
-          <li class="folder-item" data-folder="personal">
-            <p>工作</p>
-            <button class="edit-note-btn">✏️</button>
-            <button class="delete-note-btn">❌</button>
-          </li>
-          <li class="folder-item" data-folder="ideas">
-            <p>生活</p>
-            <button class="edit-note-btn">✏️</button>
-            <button class="delete-note-btn">❌</button>
-          </li> -->
-        </ul>
-        <button class="add-folder">+ 添加分类</button>
+        <ul class="folder-list"></ul>
+        <button class="add-folder" data-i18n-key="btn.addFolder">
+          添加分类
+        </button>
       </aside>
 
       <!-- Note List Section -->
       <section class="note-list-section">
         <header class="search-bar">
-          <input type="text" placeholder="搜索笔记..." />
-          <button class="add-note-btn">+</button>
+          <!-- 新增 data-i18n-placeholder -->
+          <input
+            type="text"
+            data-i18n-placeholder="placeholder.search"
+            placeholder="搜索笔记..."
+          />
+          <!-- “+”号一般不翻译，但你可以改成 data-i18n-key="btn.addNote" 并用文字 -->
+          <button class="add-note-btn" data-i18n-key="btn.addNoteSymbol">
+            +
+          </button>
         </header>
 
         <!-- 新增：统计和排序容器 -->
         <div class="note-info-bar">
-          <span class="note-count">共0条笔记</span>
+          <!-- 新增 data-i18n-key -->
+          <span class="note-count" data-i18n-key="text.noteCount"
+            >共0条笔记</span
+          >
           <div class="sort-dropdown-container">
-            <button class="sort-btn">排序 ▾</button>
-            <!-- 下拉框，默认隐藏，在点击 sort-btn 时切换显示/隐藏 -->
+            <!-- 新增 data-i18n-key -->
+            <button class="sort-btn" data-i18n-key="btn.sort">排序 ▾</button>
+            <!-- 下拉框，默认隐藏 -->
             <div class="sort-dropdown hidden">
               <ul>
-                <li data-sort="createTime-asc">按创建时间 (正序)</li>
-                <li data-sort="createTime-desc">按创建时间 (倒序)</li>
-                <li data-sort="lastModified-asc">按修改时间 (正序)</li>
-                <li data-sort="lastModified-desc">按修改时间 (倒序)</li>
-                <li data-sort="title-asc">按标题 (正序)</li>
-                <li data-sort="title-desc">按标题 (倒序)</li>
+                <!-- 这几个也要翻译 -->
+                <li
+                  data-sort="createTime-asc"
+                  data-i18n-key="sort.createTimeAsc"
+                >
+                  按创建时间 (正序)
+                </li>
+                <li
+                  data-sort="createTime-desc"
+                  data-i18n-key="sort.createTimeDesc"
+                >
+                  按创建时间 (倒序)
+                </li>
+                <li
+                  data-sort="lastModified-asc"
+                  data-i18n-key="sort.lastModifiedAsc"
+                >
+                  按修改时间 (正序)
+                </li>
+                <li
+                  data-sort="lastModified-desc"
+                  data-i18n-key="sort.lastModifiedDesc"
+                >
+                  按修改时间 (倒序)
+                </li>
+                <li data-sort="title-asc" data-i18n-key="sort.titleAsc">
+                  按标题 (正序)
+                </li>
+                <li data-sort="title-desc" data-i18n-key="sort.titleDesc">
+                  按标题 (倒序)
+                </li>
               </ul>
             </div>
           </div>
         </div>
 
-        <ul class="notes">
-          <!-- <li class="note-item" data-note-id="1">
-            <p>笔记标题 1</p>
-            <button class="delete-note-btn">❌</button>
-          </li>
-          <li class="note-item" data-note-id="2">
-            <p>笔记标题 2</p>
-            <button class="delete-note-btn">❌</button>
-          </li> -->
-        </ul>
+        <ul class="notes"></ul>
       </section>
 
       <!-- Note Details Section -->
@@ -89,32 +130,55 @@
         <!-- 标题上方：时间信息 + 按钮操作区 -->
         <div class="note-details-header">
           <div class="note-dates">
-            <p>创建时间： <span class="note-create-time"></span></p>
-            <p>最后修改： <span class="note-last-modified"></span></p>
+            <!-- 新增 data-i18n-key -->
+            <p data-i18n-key="label.createTime">
+              <span data-i18n-key="label.createTimePrefix">创建时间：</span>
+              <span class="note-create-time"></span>
+            </p>
+            <p data-i18n-key="label.lastModified">
+              <span data-i18n-key="label.lastModifiedPrefix">最后修改：</span>
+              <span class="note-last-modified"></span>
+            </p>
           </div>
 
           <div class="note-actions">
             <!-- 加密/解密按钮 -->
-            <button class="encrypt-toggle-btn">🔒 加密</button>
-            <button class="decrypt-toggle-btn">🔑 解密</button>
+            <button class="encrypt-toggle-btn" data-i18n-key="btn.encrypt">
+              🔒 加密
+            </button>
+            <button class="decrypt-toggle-btn" data-i18n-key="btn.decrypt">
+              🔑 解密
+            </button>
 
             <!-- 编辑模式开关：Markdown编辑 | 开关 | 富文本编辑 -->
             <div class="edit-mode-toggle">
-              <span class="mode-label-left">Markdown编辑</span>
+              <!-- 新增 data-i18n-key -->
+              <span class="mode-label-left" data-i18n-key="text.markdownEdit"
+                >Markdown编辑</span
+              >
               <label class="switch-wrapper">
                 <input type="checkbox" class="edit-mode-checkbox" />
                 <span class="switch"></span>
               </label>
-              <span class="mode-label-right">富文本编辑</span>
+              <!-- 新增 data-i18n-key -->
+              <span class="mode-label-right" data-i18n-key="text.richTextEdit"
+                >富文本编辑</span
+              >
             </div>
 
             <!-- 导出按钮 + 下拉菜单 -->
             <div class="export-dropdown-container">
-              <button class="export-btn">导出 ▾</button>
+              <!-- 新增 data-i18n-key -->
+              <button class="export-btn" data-i18n-key="btn.export">
+                导出 ▾
+              </button>
               <div class="export-dropdown hidden">
                 <ul>
-                  <li data-export="pdf">导出 PDF</li>
-                  <li data-export="markdown">导出 Markdown</li>
+                  <!-- 这两个也翻译 -->
+                  <li data-export="pdf" data-i18n-key="export.pdf">导出 PDF</li>
+                  <li data-export="markdown" data-i18n-key="export.markdown">
+                    导出 Markdown
+                  </li>
                 </ul>
               </div>
             </div>
@@ -130,6 +194,7 @@
           "
         />
 
+        <!-- 新增 data-i18n-placeholder 若你想翻译默认 "笔记标题" -->
         <input class="note-title" value="笔记标题" />
         <hr
           style="
@@ -139,58 +204,78 @@
             margin: 10px 0;
           "
         />
+        <!-- 同理，若想翻译默认文本，需 data-i18n-key 或 data-i18n-placeholder -->
         <textarea class="note-content">这里显示笔记的详细内容。</textarea>
       </section>
 
       <!-- 自定义的密码输入对话框（初始隐藏） -->
       <div class="password-modal hidden-password-modal">
         <div class="password-modal-content">
-          <h3>请输入笔记密码</h3>
+          <h3 data-i18n-key="modal.enterPwd">请输入笔记密码</h3>
           <input type="password" class="password-input" />
           <div class="modal-buttons">
-            <button class="password-confirm-btn">确认</button>
-            <button class="password-cancel-btn">取消</button>
+            <!-- 新增 data-i18n-key -->
+            <button class="password-confirm-btn" data-i18n-key="btn.confirm">
+              确认
+            </button>
+            <button class="password-cancel-btn" data-i18n-key="btn.cancel">
+              取消
+            </button>
           </div>
         </div>
       </div>
+
       <!-- 设置加密密码的对话框（初始隐藏） -->
       <div class="set-password-modal hidden-password-modal">
         <div class="set-password-modal-content">
-          <h3>设置密码</h3>
+          <h3 data-i18n-key="modal.setPwd">设置密码</h3>
           <input
             type="password"
             class="password-input"
             placeholder="请输入密码"
+            data-i18n-placeholder="placeholder.inputPwd"
           />
           <input
             type="password"
             class="confirm-password-input"
             placeholder="请再次输入密码"
+            data-i18n-placeholder="placeholder.confirmPwd"
           />
           <div class="modal-buttons">
-            <button class="password-confirm-btn">确认</button>
-            <button class="password-cancel-btn">取消</button>
+            <button class="password-confirm-btn" data-i18n-key="btn.confirm">
+              确认
+            </button>
+            <button class="password-cancel-btn" data-i18n-key="btn.cancel">
+              取消
+            </button>
           </div>
         </div>
       </div>
+
       <!-- 解密对话框 -->
       <div class="decrypt-modal hidden-password-modal">
         <div class="decrypt-modal-content">
-          <h3>解密操作</h3>
+          <h3 data-i18n-key="modal.decrypt">解密操作</h3>
           <input
             type="password"
             class="decrypt-password-input"
             placeholder="请输入密码"
+            data-i18n-placeholder="placeholder.inputPwd"
           />
           <div class="modal-buttons">
-            <button class="decrypt-confirm-btn">确认</button>
-            <button class="decrypt-cancel-btn">取消</button>
+            <button class="decrypt-confirm-btn" data-i18n-key="btn.confirm">
+              确认
+            </button>
+            <button class="decrypt-cancel-btn" data-i18n-key="btn.cancel">
+              取消
+            </button>
           </div>
         </div>
       </div>
     </div>
   </body>
-  <!-- 引入JavaScript文件 -->
+
+  <script src="Translations.js" defer></script>
   <script src="DataService.js" defer></script>
   <script src="NoteDetails.js" defer></script>
   <script src="NoteList.js" defer></script>
