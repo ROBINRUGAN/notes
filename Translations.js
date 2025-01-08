@@ -1,5 +1,8 @@
 const translations = {
   en: {
+    "folder.all": "All",
+    "folder.uncategorized": "Uncategorized",
+    "folder.trash": "Trash",
     "title.noteCategory": "Note Categories",
     "btn.addFolder": "Add Folder",
     "btn.addNote": "Add Note",
@@ -39,6 +42,9 @@ const translations = {
   },
 
   zh: {
+    "folder.all": "全部笔记",
+    "folder.uncategorized": "未分类",
+    "folder.trash": "回收站",
     "title.noteCategory": "笔记分类",
     "btn.addFolder": "添加分类",
     "btn.addNote": "添加笔记",
@@ -79,6 +85,9 @@ const translations = {
 
   // ===== 日语（ja） =====
   ja: {
+    "folder.all": "すべてのノート",
+    "folder.uncategorized": "未分類",
+    "folder.trash": "ゴミ箱",
     "title.noteCategory": "ノートカテゴリ",
     "btn.addFolder": "フォルダーを追加",
     "btn.addNote": "ノートを追加",
@@ -119,6 +128,9 @@ const translations = {
 
   // ===== 法语（fr） =====
   fr: {
+    "folder.all": "Toutes les notes",
+    "folder.uncategorized": "Non classé",
+    "folder.trash": "Corbeille",
     "title.noteCategory": "Catégories de notes",
     "btn.addFolder": "Ajouter un dossier",
     "btn.addNote": "Ajouter une note",

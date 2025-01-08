@@ -4,32 +4,19 @@ const Category = {
   init: function () {
     this.loadCategories();
     this.bindEvents();
-    this.defaultFocus();
   },
 
-  loadCategories: function () {
-    const categories = DataService.getCategories();
+  loadCategories: async function () {
+    const categories = await CloudDataService.getCategories();
     const folderList = document.querySelector(".folder-list");
-    folderList.innerHTML = "";
-
-    // 添加默认分类项 "全部笔记" 和 "未分类"
-    const defaultCategories = [
-      { id: "all", name: "全部笔记" },
-      { id: "uncategorized", name: "未分类" },
-      { id: "trash", name: "回收站" },
-    ];
-
-    defaultCategories.forEach((category) => {
-      const li = document.createElement("li");
-      li.classList.add("folder-item");
-      li.textContent = category.name;
-      li.setAttribute("data-folder", category.id);
-      folderList.appendChild(li);
-    });
 
     // 添加用户创建的分类项
     categories.forEach((category) => {
-      if (category.id !== "all" && category.id !== "uncategorized") {
+      if (
+        category.id != "all" &&
+        category.id != "uncategorized" &&
+        category.id != "trash"
+      ) {
         const li = document.createElement("li");
         li.classList.add("folder-item");
         li.setAttribute("data-folder", category.id);
@@ -58,19 +45,8 @@ const Category = {
         folderList.appendChild(li);
       }
     });
-
+    NoteList.bindCategoryDropEvents(); // 确保拖放事件在初始化时绑定
     this.bindCategorySelection();
-  },
-
-  defaultFocus: function () {
-    // 默认选择 "全部笔记"
-    const allNotesItem = document.querySelector(
-      '.folder-item[data-folder="all"]'
-    );
-    if (allNotesItem) {
-      allNotesItem.classList.add("focused");
-      NoteList.loadNotesByCategory("all");
-    }
   },
 
   bindEvents: function () {
@@ -94,33 +70,69 @@ const Category = {
     });
   },
 
-  addCategory: function () {
+  addCategory: async function () {
     const categoryName = prompt("请输入新的分类名称：");
+    const id = Date.now().toString();
     if (categoryName) {
-      DataService.addCategory({
-        id: Date.now().toString(),
+      await CloudDataService.addCategory({
+        id: id,
         name: categoryName,
       });
-      this.loadCategories();
+      // this.loadCategories();
+      // 优化：只添加新分类项
+      const folderList = document.querySelector(".folder-list");
+      const li = document.createElement("li");
+      li.classList.add("folder-item");
+      li.setAttribute("data-folder", id);
+      const p = document.createElement("p");
+      p.textContent = categoryName;
+      li.appendChild(p);
+      const editBtn = document.createElement("button");
+      editBtn.classList.add("edit-note-btn");
+      editBtn.textContent = "✏️";
+      editBtn.addEventListener("click", () => this.editCategory(id));
+      li.appendChild(editBtn);
+      const deleteBtn = document.createElement("button");
+      deleteBtn.classList.add("delete-note-btn");
+
+      deleteBtn.textContent = "❌";
+      deleteBtn.addEventListener("click", () => this.deleteCategory(id));
+      li.appendChild(deleteBtn);
+      folderList.appendChild(li);
+      this.bindCategorySelection();
     }
   },
 
-  editCategory: function (categoryId) {
+  editCategory: async function (categoryId) {
     const newCategoryName = prompt("请输入新的分类名称：");
     if (newCategoryName) {
-      DataService.updateCategoryName(categoryId, newCategoryName);
-      this.loadCategories();
+      await CloudDataService.updateCategoryName(categoryId, newCategoryName);
+      // this.loadCategories();
+      // 优化：只更新当前分类项的名称
+      const folderItems = document.querySelectorAll(".folder-item");
+      folderItems.forEach((item) => {
+        if (item.getAttribute("data-folder") === categoryId) {
+          item.querySelector("p").textContent = newCategoryName;
+        }
+      });
     }
   },
 
-  deleteCategory: function (categoryId) {
+  deleteCategory: async function (categoryId) {
     const confirmDelete = confirm(
       "确定要删除该分类吗？分类下的笔记将移动到未分类。"
     );
     if (confirmDelete) {
-      DataService.moveNotesToUncategorized(categoryId);
-      DataService.deleteCategory(categoryId);
-      this.loadCategories();
+      await CloudDataService.moveNotesToUncategorized(categoryId);
+      await CloudDataService.deleteCategory(categoryId);
+      // this.loadCategories();
+      // 优化：只删除当前分类项
+      const folderItems = document.querySelectorAll(".folder-item");
+      folderItems.forEach((item) => {
+        if (item.getAttribute("data-folder") === categoryId) {
+          item.remove();
+        }
+      });
     }
   },
 };

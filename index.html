@@ -9,6 +9,15 @@
     <link rel="stylesheet" href="components.css" />
     <link rel="stylesheet" href="modals.css" />
     <link rel="stylesheet" href="themes.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/simplemde@1.11.2/dist/simplemde.min.css"
+    />
+    <link
+      href="https://cdn.quilljs.com/1.3.6/quill.snow.css"
+      rel="stylesheet"
+    />
+
     <title>哈你笔记 - HoneyNotes</title>
   </head>
   <body>
@@ -53,7 +62,38 @@
           <button id="mode-toggle-btn" class="mode-toggle-btn">🌙</button>
         </div>
 
-        <ul class="folder-list"></ul>
+        <ul class="folder-list">
+          <li
+            class="folder-item focused"
+            data-folder="all"
+            data-i18n-key="folder.all"
+          >
+            全部笔记
+          </li>
+          <li
+            class="folder-item"
+            data-folder="uncategorized"
+            data-i18n-key="folder.uncategorized"
+          >
+            未分类
+          </li>
+          <li
+            class="folder-item"
+            data-folder="trash"
+            data-i18n-key="folder.trash"
+          >
+            回收站
+          </li>
+          <hr
+            style="
+              margin: 10px 0;
+              background-color: #ccc;
+              height: 1px;
+              border: none;
+            "
+          />
+        </ul>
+
         <button class="add-folder" data-i18n-key="btn.addFolder">
           添加分类
         </button>
@@ -126,7 +166,7 @@
       </section>
 
       <!-- Note Details Section -->
-      <section class="note-details-section">
+      <section class="note-details-section hidden">
         <!-- 标题上方：时间信息 + 按钮操作区 -->
         <div class="note-details-header">
           <div class="note-dates">
@@ -204,8 +244,8 @@
             margin: 10px 0;
           "
         />
-        <!-- 同理，若想翻译默认文本，需 data-i18n-key 或 data-i18n-placeholder -->
-        <textarea class="note-content">这里显示笔记的详细内容。</textarea>
+
+        <div id="editorContainer"></div>
       </section>
 
       <!-- 自定义的密码输入对话框（初始隐藏） -->
@@ -273,12 +313,24 @@
         </div>
       </div>
     </div>
-  </body>
 
-  <script src="Translations.js" defer></script>
-  <script src="DataService.js" defer></script>
-  <script src="NoteDetails.js" defer></script>
-  <script src="NoteList.js" defer></script>
-  <script src="Category.js" defer></script>
-  <script src="Common.js" defer></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+      integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/simplemde@1.11.2/dist/simplemde.min.js"
+      defer
+    ></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js" defer></script>
+    <script src="Translations.js" defer></script>
+    <script src="CloudDataService.js" defer></script>
+    <script src="NoteDetails.js" defer></script>
+    <script src="NoteList.js" defer></script>
+    <script src="Category.js" defer></script>
+    <script src="Common.js" defer></script>
+    <script src="Editor.js"></script>
+  </body>
 </html>

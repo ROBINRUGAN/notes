@@ -387,3 +387,8 @@
 .mode-toggle-btn:hover {
   background-color: #0056b3;
 }
+
+#editorContainer {
+  height: 100%;
+  overflow: scroll;
+}

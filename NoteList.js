@@ -1,5 +1,4 @@
 // NoteList.js - Handles note list management
-
 const NoteList = {
   tempUnlockedNotes: {}, // 记录笔记是否在当前会话中已解锁
 
@@ -11,7 +10,6 @@ const NoteList = {
   init: function () {
     this.loadNotes();
     this.bindEvents();
-    this.bindCategoryDropEvents(); // 确保拖放事件在初始化时绑定
   },
 
   loadNotes: function () {
@@ -84,12 +82,13 @@ const NoteList = {
     if (noteCountEl) {
       noteCountEl.textContent = `共${notes.length}条笔记`;
     }
-
-    this.bindCategoryDropEvents();
   },
 
   bindDragEvents: function (noteItem) {
+    noteItem.removeEventListener("dragstart", () => {});
+
     noteItem.addEventListener("dragstart", (event) => {
+      event.stopPropagation();
       event.dataTransfer.setData(
         "text/plain",
         noteItem.getAttribute("data-note-id")
@@ -97,12 +96,17 @@ const NoteList = {
     });
   },
 
-  bindCategoryDropEvents: function () {
+  bindCategoryDropEvents: async function () {
     const folderItems = document.querySelectorAll(".folder-item");
-
     folderItems.forEach((folder) => {
+      // 先清空EventListener
+      folder.removeEventListener("dragover", () => {});
+      folder.removeEventListener("dragleave", () => {});
+      folder.removeEventListener("drop", () => {});
+
       folder.addEventListener("dragover", (event) => {
         event.preventDefault(); // 必须阻止默认行为，否则 drop 事件无法触发
+        event.stopPropagation();
         folder.classList.add("drag-over");
       });
 
@@ -110,53 +114,58 @@ const NoteList = {
         folder.classList.remove("drag-over");
       });
 
-      folder.addEventListener("drop", (event) => {
+      folder.addEventListener("drop", async (event) => {
         event.preventDefault();
+        event.stopPropagation();
         folder.classList.remove("drag-over");
 
         const noteId = event.dataTransfer.getData("text/plain");
         const targetFolderId = folder.getAttribute("data-folder");
 
         // 获取当前笔记的分类
-        const note = DataService.getNoteById(noteId);
-
-        folderItems.forEach((item) => item.classList.remove("focused"));
-        folder.classList.add("focused");
+        const note = await CloudDataService.getNoteById(noteId);
 
         if (
           !note ||
           note.categoryId === targetFolderId ||
           targetFolderId === "all"
         ) {
-          // 刷新目标分类的笔记列表
-          this.loadNotesByCategory(targetFolderId);
-          console.log("Note is already in the same folder. No action taken.");
           return;
         }
 
-        // 更新笔记的分类
-        DataService.moveNoteToCategory(noteId, targetFolderId);
+        if (note.categoryId === "trash") {
+          const confirmRestore = confirm("确认要将该笔记还原到指定分类吗？");
 
-        // 刷新目标分类的笔记列表
-        this.loadNotesByCategory(targetFolderId);
+          if (confirmRestore) {
+            await CloudDataService.moveNoteToCategory(noteId, targetFolderId);
+            this.applyFiltersAndRender();
+            folderItems.forEach((item) => item.classList.remove("focused"));
+            folder.classList.add("focused");
+            this.applyFiltersAndRender();
+          }
+          return;
+        }
+
+        if (targetFolderId === "trash") {
+          const confirmDelete = confirm("确定要删除该笔记吗？将移动到垃圾箱。");
+          if (confirmDelete) {
+            await CloudDataService.moveNoteToTrash(noteId);
+            folderItems.forEach((item) => item.classList.remove("focused"));
+            folder.classList.add("focused");
+            this.applyFiltersAndRender();
+          }
+          return;
+        }
+        folderItems.forEach((item) => item.classList.remove("focused"));
+        folder.classList.add("focused");
+        // 更新笔记的分类
+        await CloudDataService.moveNoteToCategory(noteId, targetFolderId);
+
+        // 重新渲染
+        this.applyFiltersAndRender();
       });
     });
   },
-
-  // ========= 关键：对每个 .note-item 都加点击事件 -> 显示详情 =========
-  // bindNoteSelection: function () {
-  //   const noteItems = document.querySelectorAll(".note-item");
-  //   noteItems.forEach((item) => {
-  //     item.addEventListener("click", (event) => {
-  //       // 先把其他 note-item 的 focused 去掉
-  //       noteItems.forEach((i) => i.classList.remove("focused"));
-  //       // 给当前点击的 note-item 添加 focused
-  //       event.currentTarget.classList.add("focused");
-  //       // 显示笔记详情
-  //       this.showNoteDetails(event.currentTarget.getAttribute("data-note-id"));
-  //     });
-  //   });
-  // },
 
   bindEvents: function () {
     document
@@ -194,9 +203,64 @@ const NoteList = {
     decryptBtn.addEventListener("click", () => {
       this.handleDecrypt();
     });
+
+    const exportBtn = document.querySelector(".export-btn");
+    const exportDropdown = document.querySelector(".export-dropdown");
+
+    exportBtn.addEventListener("click", () => {
+      exportDropdown.classList.toggle("hidden");
+    });
+
+    exportDropdown.addEventListener("click", (event) => {
+      if (event.target.tagName.toLowerCase() === "li") {
+        const exportType = event.target.getAttribute("data-export"); // "pdf" or "markdown"
+        this.handleExport(currentNote, exportType);
+        exportDropdown.classList.add("hidden");
+      }
+    });
   },
 
-  handleNotesClick: function (event) {
+  handleExport: function (note, exportType) {
+    // 安全处理文件名：去掉某些非法字符
+    const safeTitle = (note.title || "未命名").replace(
+      /[\\\/:\*\?"<>\|]/g,
+      "_"
+    );
+
+    if (exportType === "pdf") {
+      const hiddenDiv = document.createElement("div");
+      hiddenDiv.innerHTML = `
+        <h2 style="margin-bottom: 10px;">${note.title}</h2>
+        <div>${note.content || ""}</div>
+      `;
+
+      const opt = {
+        margin: 24, // PDF 边距
+        filename: safeTitle + ".pdf", // 导出的文件名
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 }, // 放大倍数
+        jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
+      };
+
+      html2pdf().set(opt).from(hiddenDiv).save();
+    } else if (exportType === "markdown") {
+      // 加上标题和时间
+      const markdownContent = `# ${note.title}\n\n${note.content || ""}`;
+
+      const blob = new Blob([markdownContent], { type: "text/markdown" });
+      // const blob = new Blob([note.content || ""], { type: "text/markdown" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = safeTitle + ".md";
+      link.click();
+
+      URL.revokeObjectURL(url);
+    }
+  },
+
+  handleNotesClick: async function (event) {
     const noteItem = event.target.closest(".note-item");
     if (!noteItem) return; // 点到空白，不做事
 
@@ -209,7 +273,7 @@ const NoteList = {
       event.preventDefault();
       const confirmDelete = confirm("确定要删除该笔记吗？将移动到垃圾箱。");
       if (confirmDelete) {
-        DataService.moveNoteToTrash(noteId);
+        await CloudDataService.moveNoteToTrash(noteId);
         this.loadNotes();
       }
       return;
@@ -221,7 +285,7 @@ const NoteList = {
       event.preventDefault();
       const confirmPermDelete = confirm("此操作不可恢复，确定要彻底删除吗？");
       if (confirmPermDelete) {
-        DataService.permanentlyDeleteNote(noteId);
+        await CloudDataService.permanentlyDeleteNote(noteId);
         this.loadNotes();
       }
       return;
@@ -233,7 +297,7 @@ const NoteList = {
       event.preventDefault();
       const confirmRestore = confirm("确认要还原此笔记吗？");
       if (confirmRestore) {
-        DataService.restoreNoteFromTrash(noteId);
+        await CloudDataService.restoreNoteFromTrash(noteId);
         this.loadNotes();
       }
       return;
@@ -259,7 +323,7 @@ const NoteList = {
       return;
     }
     const noteId = noteItem.getAttribute("data-note-id");
-    let note = DataService.getNoteById(noteId);
+    let note = await CloudDataService.getNoteById(noteId);
     if (!note) return;
 
     // 如果已经加密了，就不继续
@@ -288,7 +352,7 @@ const NoteList = {
     // 设置加密
     note.isEncrypted = true;
     note.password = pwd1;
-    DataService.updateNote(note);
+    await CloudDataService.updateNote(note);
 
     // 隐藏详情页
     const noteDetailsSection = document.querySelector(".note-details-section");
@@ -308,7 +372,7 @@ const NoteList = {
       return;
     }
     const noteId = noteItem.getAttribute("data-note-id");
-    let note = DataService.getNoteById(noteId);
+    let note = await CloudDataService.getNoteById(noteId);
     if (!note) return;
 
     // 如果没加密就不处理
@@ -332,7 +396,7 @@ const NoteList = {
     // 解密成功
     note.isEncrypted = false;
     note.password = "";
-    DataService.updateNote(note);
+    await CloudDataService.updateNote(note);
 
     // 重新渲染笔记列表
     this.applyFiltersAndRender();
@@ -352,15 +416,16 @@ const NoteList = {
   },
 
   // 统一调用此方法来“获取当前分类的笔记 -> 搜索过滤 -> 排序 -> render”
-  applyFiltersAndRender: function () {
+  applyFiltersAndRender: async function () {
     // 1. 获取当前焦点分类
     const currentFolder = document.querySelector(".folder-item.focused");
+
     const folderId = currentFolder
       ? currentFolder.getAttribute("data-folder")
       : "all";
 
     // 2. 获取所有笔记
-    let notes = DataService.getNotes();
+    let notes = await CloudDataService.getNotes();
 
     // 3. 按分类过滤
     if (folderId === "all") {
@@ -411,7 +476,7 @@ const NoteList = {
     this.searchNotes(query);
   },
 
-  searchNotes: function (query) {
+  searchNotes: async function (query) {
     // 1. 获取当前选中的分类
     const currentFolder = document.querySelector(".folder-item.focused");
     const folderId = currentFolder
@@ -419,7 +484,7 @@ const NoteList = {
       : "all";
 
     // 2. 获取所有笔记
-    const notes = DataService.getNotes();
+    const notes = await CloudDataService.getNotes();
 
     // 3. 如果当前分类不是"all"，先按分类过滤
     let filteredNotes =
@@ -445,7 +510,7 @@ const NoteList = {
 
   // 其余函数如 addNote、handleNoteClick、showNoteDetails 等处
   // 新建笔记时，为笔记自动加上 createTime / lastModified
-  addNote: function () {
+  addNote: async function () {
     const currentFolder = document.querySelector(".folder-item.focused");
     const categoryId = currentFolder
       ? currentFolder.getAttribute("data-folder")
@@ -462,7 +527,7 @@ const NoteList = {
         lastModified: Date.now(),
       };
 
-      DataService.addNote(newNote);
+      await CloudDataService.addNote(newNote);
       // 添加完毕后，重新渲染
       this.loadNotesByCategory(categoryId);
 
@@ -480,7 +545,7 @@ const NoteList = {
   },
 
   showNoteDetails: async function (noteId) {
-    const note = DataService.getNoteById(noteId);
+    const note = await CloudDataService.getNoteById(noteId);
     if (!note) return;
 
     if (note.isEncrypted) {
@@ -497,7 +562,7 @@ const NoteList = {
             // 正确 => 标记临时解锁
             this.tempUnlockedNotes[noteId] = true;
 
-            this.renderNotes(DataService.getNotes());
+            this.renderNotes(await CloudDataService.getNotes());
             const newNoteItem = document.querySelector(
               `.note-item[data-note-id="${noteId}"]`
             );
@@ -517,29 +582,53 @@ const NoteList = {
   },
 
   renderNoteDetails(note) {
-    let noteTitleInput = document.querySelector(".note-title");
-    let noteContentInput = document.querySelector(".note-content");
+    // 1) 记录“当前笔记”为全局，这样在 switchEditorMode() 里也能访问
+    currentNote = note; // <-- 关键改动
+
     const noteDetailsSection = document.querySelector(".note-details-section");
-
-    // 替换旧 input
-    let newTitleInput = noteTitleInput.cloneNode(true);
-    let newContentInput = noteContentInput.cloneNode(true);
-    noteTitleInput.replaceWith(newTitleInput);
-    noteContentInput.replaceWith(newContentInput);
-
-    noteTitleInput = newTitleInput;
-    noteContentInput = newContentInput;
-
-    // 显示笔记详情
     noteDetailsSection.classList.remove("hidden");
 
-    // 设置当前笔记内容
-    noteTitleInput.value = note.title;
-    noteContentInput.value = note.content;
+    // ---------- 标题输入处理 ----------
+    let noteTitleInput = document.querySelector(".note-title");
 
-    // ======= 显示时间 =======
+    // 为避免多次绑定input事件，可以做一次“克隆”替换：
+    const newTitleInput = noteTitleInput.cloneNode(true);
+    noteTitleInput.replaceWith(newTitleInput);
+    noteTitleInput = newTitleInput;
+
+    // 设置标题
+    noteTitleInput.value = note.title;
+
+    // 每次点击别的笔记，都要重新监听“input”事件
+    noteTitleInput.addEventListener("input", async () => {
+      currentNote.title = noteTitleInput.value;
+      currentNote.lastModified = Date.now(); // <-- 关键改动：更新最后修改
+      await CloudDataService.updateNote(currentNote);
+
+      // 若要实时刷新“最后修改时间”，可做：
+      const lastModifiedEl = document.querySelector(".note-last-modified");
+      if (lastModifiedEl) {
+        lastModifiedEl.textContent = new Date(
+          currentNote.lastModified
+        ).toLocaleString();
+      }
+    });
+
+    // ---------- 初始化编辑器（默认Markdown） ----------
+    initEditorForNote(currentNote); // <-- 使用 currentNote
+
+    // 如果复选框勾选 => 切到富文本，否则Markdown
+    const editModeCheckbox = document.querySelector(".edit-mode-checkbox");
+    if (editModeCheckbox.checked) {
+      switchEditorMode("richtext");
+    } else {
+      switchEditorMode("markdown");
+    }
+
+    // ---------- 显示时间 ----------
     const createTimeEl = document.querySelector(".note-create-time");
     const lastModifiedEl = document.querySelector(".note-last-modified");
+
     if (createTimeEl) {
       createTimeEl.textContent = note.createTime
         ? new Date(note.createTime).toLocaleString()
@@ -551,38 +640,13 @@ const NoteList = {
         : "无";
     }
 
-    // ====== 监听编辑，实时更新 ======
-    noteTitleInput.addEventListener("input", () => {
-      note.title = noteTitleInput.value;
-      DataService.updateNote(note);
-      // 更新lastModified
-      if (lastModifiedEl) {
-        lastModifiedEl.textContent = new Date(
-          note.lastModified
-        ).toLocaleString();
-      }
-    });
-
-    noteContentInput.addEventListener("input", () => {
-      note.content = noteContentInput.value;
-      DataService.updateNote(note);
-      // 同理
-      if (lastModifiedEl) {
-        lastModifiedEl.textContent = new Date(
-          note.lastModified
-        ).toLocaleString();
-      }
-    });
-
-    // 根据笔记是否加密，动态显示 加密按钮/解密按钮
+    // ---------- 加密/解密按钮控制 ----------
     const encryptBtn = document.querySelector(".encrypt-toggle-btn");
     const decryptBtn = document.querySelector(".decrypt-toggle-btn");
     if (note.isEncrypted) {
-      // 显示“解密”按钮，隐藏“加密”按钮
       encryptBtn.classList.add("hidden-encrypt-btn");
       decryptBtn.classList.remove("hidden-encrypt-btn");
     } else {
-      // 显示“加密”按钮，隐藏“解密”按钮
       encryptBtn.classList.remove("hidden-encrypt-btn");
       decryptBtn.classList.add("hidden-encrypt-btn");
     }

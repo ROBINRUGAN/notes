@@ -1,6 +1,6 @@
-// DataService.js - Handles data storage and retrieval
+// LocalDataService.js - Handles data storage and retrieval
 
-const DataService = {
+const LocalDataService = {
   // 获取所有分类
   getCategories: function () {
     return JSON.parse(localStorage.getItem("categories")) || [];
