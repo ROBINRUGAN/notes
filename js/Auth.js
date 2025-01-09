@@ -93,7 +93,7 @@ const AuthService = {
   logout: async function () {
     await CloudDataService.logout();
     alert("已退出登录");
-    window.location.href = "login.html";
+    window.location.href = "./login.html";
   },
 };
 
