@@ -64,17 +64,13 @@ const NoteList = {
           icon = "🔒 "; // 未解锁
         }
       }
-      li.innerHTML = `<p>${icon}${note.title}</p><button class="delete-note-btn">❌</button>`;
-
-      // 如果不是垃圾箱笔记，用“删除”按钮
-      // 如果是垃圾箱笔记，用“彻底删除”+“还原”按钮
-      if (isTrash) {
-        li.innerHTML = `<p>${icon}${note.title}</p><button class="perm-delete-note-btn">❌</button><button class="restore-note-btn">↩️</button> `;
-      }
+      // 使用 highlightedTitle 替代原始 title
+      li.innerHTML = `<p>${icon}${note.highlightedTitle || note.title}</p>${isTrash
+        ? '<button class="perm-delete-note-btn">❌</button><button class="restore-note-btn">↩️</button>'
+        : '<button class="delete-note-btn">❌</button>'
+        }`;
 
       noteList.appendChild(li);
-
-      // 绑定拖拽事件
       this.bindDragEvents(li);
     });
     // ======= 新增：更新笔记数量 =======
@@ -85,7 +81,7 @@ const NoteList = {
   },
 
   bindDragEvents: function (noteItem) {
-    noteItem.removeEventListener("dragstart", () => {});
+    noteItem.removeEventListener("dragstart", () => { });
 
     noteItem.addEventListener("dragstart", (event) => {
       event.stopPropagation();
@@ -100,9 +96,9 @@ const NoteList = {
     const folderItems = document.querySelectorAll(".folder-item");
     folderItems.forEach((folder) => {
       // 先清空EventListener
-      folder.removeEventListener("dragover", () => {});
-      folder.removeEventListener("dragleave", () => {});
-      folder.removeEventListener("drop", () => {});
+      folder.removeEventListener("dragover", () => { });
+      folder.removeEventListener("dragleave", () => { });
+      folder.removeEventListener("drop", () => { });
 
       folder.addEventListener("dragover", (event) => {
         event.preventDefault(); // 必须阻止默认行为，否则 drop 事件无法触发
@@ -681,12 +677,28 @@ const NoteList = {
         ? notes
         : notes.filter((note) => note.categoryId === folderId);
 
-    // 4. 如果搜索关键词非空，再进行二次过滤（标题或内容包含关键字）
+    // 4. 如果搜索关键词非空，进行过滤和标题处理
     if (query) {
       filteredNotes = filteredNotes.filter((note) => {
-        const titleMatch = note.title.includes(query);
-        const contentMatch = note.content.includes(query);
+        const titleMatch = note.title.toLowerCase().includes(query);
+        const contentMatch = note.content.toLowerCase().includes(query);
+
+        // 添加高亮标记的标题
+        if (titleMatch) {
+          note.highlightedTitle = note.title.replace(
+            new RegExp(query, 'gi'),
+            match => `<mark>${match}</mark>`
+          );
+        } else {
+          note.highlightedTitle = note.title;
+        }
+
         return titleMatch || contentMatch;
+      });
+    } else {
+      // 清空搜索时，清除高亮标记
+      filteredNotes.forEach(note => {
+        note.highlightedTitle = note.title;
       });
     }
 

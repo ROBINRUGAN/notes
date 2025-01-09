@@ -13,3 +13,9 @@ body {
 .drag-over {
   background-color: var(--primary-color);
 }
+
+mark {
+  background-color: #ff6;
+  padding: 0;
+  color: inherit;
+}
