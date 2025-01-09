@@ -403,7 +403,7 @@ function uploadFile() {
   }
 
   $file = $_FILES['file'];
-  $uploadDir = __DIR__ . '/../assets/';
+  $uploadDir = __DIR__ . '/../../assets/';
   $uploadFile = $uploadDir . basename($file['name']);
 
   // 调试信息

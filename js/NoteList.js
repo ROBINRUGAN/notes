@@ -230,19 +230,82 @@ const NoteList = {
     if (exportType === "pdf") {
       const hiddenDiv = document.createElement("div");
       hiddenDiv.innerHTML = `
-        <h2 style="margin-bottom: 10px;">${note.title}</h2>
-        <div>${note.content || ""}</div>
+      <style>
+        .pdf-container {
+          width: 100%;
+          max-width: 595pt; /* A4纸宽度 */
+          margin: 0 auto;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        img {
+          max-width: 100% !important;
+          height: auto !important;
+          display: block;
+          margin: 10px auto;
+        }
+        h1, h2, h3, h4, h5, h6 { margin-top: 24px; margin-bottom: 16px; font-weight: 600; line-height: 1.25; }
+        h1 { font-size: 2em; }
+        h2 { font-size: 1.5em; }
+        code { padding: 0.2em 0.4em; background-color: rgba(27,31,35,0.05); border-radius: 3px; }
+        pre { padding: 16px; overflow: auto; line-height: 1.45; background-color: #f6f8fa; border-radius: 3px; }
+        pre code { padding: 0; background-color: transparent; }
+        blockquote { padding: 0 1em; color: #6a737d; border-left: 0.25em solid #dfe2e5; }
+        table { border-spacing: 0; border-collapse: collapse; }
+        td, th { padding: 6px 13px; border: 1px solid #dfe2e5; }
+        
+      </style>
+        <h1>${note.title}</h1>
+        <div>${marked.parse(note.content || "")}</div>
       `;
 
+      // 将所有图片转换为 base64
+      const convertImagesToBase64 = async (div) => {
+        const images = div.getElementsByTagName("img");
+        const promises = Array.from(images).map(
+          (img) =>
+            new Promise((resolve) => {
+              const tempImg = new Image();
+              tempImg.crossOrigin = "anonymous"; // 添加这行
+
+              tempImg.onload = function () {
+                try {
+                  const canvas = document.createElement("canvas");
+                  canvas.width = tempImg.width;
+                  canvas.height = tempImg.height;
+                  const ctx = canvas.getContext("2d");
+                  ctx.drawImage(tempImg, 0, 0);
+                  img.src = canvas.toDataURL("image/png");
+                } catch (e) {
+                  console.error("Canvas export failed:", e);
+                  // 如果转换失败，保留原始图片
+                }
+                resolve();
+              };
+              tempImg.src = img.src;
+            })
+        );
+
+        return Promise.all(promises);
+      };
+
       const opt = {
-        margin: 24, // PDF 边距
-        filename: safeTitle + ".pdf", // 导出的文件名
+        margin: 24,
+        filename: safeTitle + ".pdf",
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 }, // 放大倍数
+        html2canvas: {
+          scale: 2,
+          logging: true, // 启用日志以便调试
+          allowTaint: true, // 允许使用跨域图片
+          useCORS: true, // 使用跨域
+        },
         jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
       };
 
-      html2pdf().set(opt).from(hiddenDiv).save();
+      // 等待所有图片加载完成后再生成PDF
+      convertImagesToBase64(hiddenDiv).then(() => {
+        html2pdf().set(opt).from(hiddenDiv).save();
+      });
     } else if (exportType === "markdown") {
       // 加上标题和时间
       const markdownContent = `# ${note.title}\n\n${note.content || ""}`;
@@ -259,47 +322,107 @@ const NoteList = {
       URL.revokeObjectURL(url);
     } else if (exportType === "pdf-link") {
       const hiddenDiv = document.createElement("div");
+
       hiddenDiv.innerHTML = `
-        <h2 style="margin-bottom: 10px;">${note.title}</h2>
-        <div>${note.content || ""}</div>
+      <style>
+        .pdf-container {
+          width: 100%;
+          max-width: 595pt; /* A4纸宽度 */
+          margin: 0 auto;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        img {
+          max-width: 100% !important;
+          height: auto !important;
+          display: block;
+          margin: 10px auto;
+        }
+        h1, h2, h3, h4, h5, h6 { margin-top: 24px; margin-bottom: 16px; font-weight: 600; line-height: 1.25; }
+        h1 { font-size: 2em; }
+        h2 { font-size: 1.5em; }
+        code { padding: 0.2em 0.4em; background-color: rgba(27,31,35,0.05); border-radius: 3px; }
+        pre { padding: 16px; overflow: auto; line-height: 1.45; background-color: #f6f8fa; border-radius: 3px; }
+        pre code { padding: 0; background-color: transparent; }
+        blockquote { padding: 0 1em; color: #6a737d; border-left: 0.25em solid #dfe2e5; }
+        table { border-spacing: 0; border-collapse: collapse; }
+        td, th { padding: 6px 13px; border: 1px solid #dfe2e5; }
+        
+      </style>
+        <h1>${note.title}</h1>
+        <div>${marked.parse(note.content || "")}</div>
       `;
 
+      // 将所有图片转换为 base64
+      const convertImagesToBase64 = async (div) => {
+        const images = div.getElementsByTagName("img");
+        const promises = Array.from(images).map(
+          (img) =>
+            new Promise((resolve) => {
+              const tempImg = new Image();
+              tempImg.crossOrigin = "anonymous"; // 添加这行
+
+              tempImg.onload = function () {
+                try {
+                  const canvas = document.createElement("canvas");
+                  canvas.width = tempImg.width;
+                  canvas.height = tempImg.height;
+                  const ctx = canvas.getContext("2d");
+                  ctx.drawImage(tempImg, 0, 0);
+                  img.src = canvas.toDataURL("image/png");
+                } catch (e) {
+                  console.error("Canvas export failed:", e);
+                  // 如果转换失败，保留原始图片
+                }
+                resolve();
+              };
+              tempImg.src = img.src;
+            })
+        );
+
+        return Promise.all(promises);
+      };
+
       const opt = {
-        margin: 24, // PDF 边距
-        filename: safeTitle + ".pdf", // 导出的文件名
+        margin: 24,
+        filename: safeTitle + ".pdf",
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 }, // 放大倍数
+        html2canvas: {
+          scale: 2,
+          logging: true, // 启用日志以便调试
+          allowTaint: true, // 允许使用跨域图片
+          useCORS: true, // 使用跨域
+        },
         jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
       };
-      // 1. 把对应的pdf文件保存到相对路径 ../assets/下面，因为我到时候是部署到服务器的，然后这个地方其实就是我文件的存储位置
-      // 2. 接着，保存完后，直接制作一个字符串，也就是我的url，格式就是https://file.mewtopia.cn/assets/filename.pdf
-      // 3. 把这个链接复制到剪切板，以及alert文字提示说“链接已生成，已复制到剪切板。”
 
-      html2pdf()
-        .set(opt)
-        .from(hiddenDiv)
-        .outputPdf("blob")
-        .then(function (pdfBlob) {
-          CloudDataService.uploadFile(pdfBlob, `${safeTitle}.pdf`)
-            .then((data) => {
-              if (data.success) {
-                const url = data.url;
-                navigator.clipboard.writeText(url).then(
-                  function () {
-                    alert("链接已生成，已复制到剪切板。");
-                  },
-                  function (err) {
-                    console.error("无法复制到剪切板: ", err);
-                  }
-                );
-              } else {
-                console.error("上传失败: ", data.error);
-              }
-            })
-            .catch((error) => {
-              console.error("上传失败: ", error);
-            });
-        });
+      convertImagesToBase64(hiddenDiv).then(() => {
+        html2pdf()
+          .set(opt)
+          .from(hiddenDiv)
+          .outputPdf("blob")
+          .then(function (pdfBlob) {
+            CloudDataService.uploadFile(pdfBlob, `${safeTitle}.pdf`)
+              .then((data) => {
+                if (data.success) {
+                  const url = data.url;
+                  navigator.clipboard.writeText(url).then(
+                    function () {
+                      alert("链接已生成，已复制到剪切板。");
+                    },
+                    function (err) {
+                      console.error("无法复制到剪切板: ", err);
+                    }
+                  );
+                } else {
+                  console.error("上传失败: ", data.error);
+                }
+              })
+              .catch((error) => {
+                console.error("上传失败: ", error);
+              });
+          });
+      });
     } else if (exportType === "markdown-link") {
       const markdownContent = `# ${note.title}\n\n${note.content || ""}`;
 
