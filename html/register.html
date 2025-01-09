@@ -9,14 +9,39 @@
   <body>
     <div class="auth-container">
       <img class="auth-logo" src="../assets/logo.gif" alt="logo" />
-      <h2>用户注册</h2>
-      <input id="username" type="text" placeholder="输入用户名" />
-      <input id="password" type="password" placeholder="输入密码" />
-      <button id="registerBtn">注册</button>
-      <p>已有账号？<a class="auth-link" href="./login.html">去登录</a></p>
+      <h2 data-i18n-key="register.userRegister">用户注册</h2>
+      <input
+        id="username"
+        type="text"
+        placeholder="输入用户名"
+        data-i18n-placeholder="register.inputUsername"
+      />
+      <input
+        id="password"
+        type="password"
+        placeholder="输入密码"
+        data-i18n-placeholder="register.inputPassword"
+      />
+      <button id="registerBtn" data-i18n-key="register.registerBtn">
+        注册
+      </button>
+      <p>
+        <span data-i18n-key="register.alreadyHaveAccount">已有账号？</span>
+        <a
+          class="auth-link"
+          href="../html/login.html"
+          data-i18n-key="register.goLogin"
+        >
+          去登录
+        </a>
+      </p>
+      <div class="top-bar">
+        <span>222200314吴荣榜</span>
+        <span>Web程序设计实践项目</span>
+      </div>
     </div>
-
-    <script src="../js/CloudDataService.js" defer></script>
-    <script src="../js/Auth.js" defer></script>
   </body>
+  <script src="../js/Translations.js" defer></script>
+  <script src="../js/CloudDataService.js" defer></script>
+  <script src="../js/Auth.js" defer></script>
 </html>

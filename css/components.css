@@ -391,5 +391,5 @@
 
 #editorContainer {
   flex-shrink: 0;
-  overflow: scroll;
+  overflow: hidden;
 }

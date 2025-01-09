@@ -9,16 +9,19 @@ const AuthService = {
     (async () => {
       const session = await CloudDataService.checkSession();
       if (!session.success) {
-        alert("请先登录");
-        window.location.href = "login.html";
+        let savedLang = localStorage.getItem("userLanguage") || navigator.language.split("-")[0];
+        const langPack = translations[savedLang];
+        alert(langPack["msg.loginFirst"]);
+        window.location.href = "/html/login.html";
       } else {
-        const greetingEl = document.getElementById("userGreeting");
-        if (greetingEl)
-          greetingEl.textContent = session.username
-            ? `欢迎，${session.username}`
-            : "欢迎，用户";
-
+        const nameEl = document.getElementById("userGreeting");
+        const welcomeEl = document.getElementById("welcomeState");
+        const logoutEl = document.getElementById("logoutState");
+        welcomeEl.style.display = "inline";
+        logoutEl.style.display = "none";
+        nameEl.textContent = session.username
         const logoutBtn = document.getElementById("logoutBtn");
+        logoutBtn.style.display = "inline";
         if (logoutBtn) {
           logoutBtn.addEventListener("click", async () => {
             await AuthService.logout();
@@ -30,21 +33,24 @@ const AuthService = {
 
   // 初始化 login.html 的登录逻辑
   initLoginPage: function () {
+    let savedLang = localStorage.getItem("userLanguage") || navigator.language.split("-")[0];
+    const langPack = translations[savedLang];
     const loginBtn = document.getElementById("loginBtn");
     if (!loginBtn) return;
     async function login() {
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
       if (!username || !password) {
-        alert("请填写完整信息");
+        alert(langPack["msg.fillInfo"]);
         return;
       }
       const result = await CloudDataService.login(username, password);
       if (result.success) {
-        alert(result.msg);
-        window.location.href = "index.html";
+        alert(langPack["msg.loginSuccess"]);
+
+        window.location.href = "/html/index.html";
       } else {
-        alert(result.msg);
+        alert(langPack["msg.wrongInfo"]);
       }
     }
     document
@@ -70,30 +76,38 @@ const AuthService = {
 
   // 初始化 register.html 的注册逻辑
   initRegisterPage: function () {
+    let savedLang = localStorage.getItem("userLanguage") || navigator.language.split("-")[0];
+    const langPack = translations[savedLang];
     const registerBtn = document.getElementById("registerBtn");
     if (!registerBtn) return;
     registerBtn.addEventListener("click", async () => {
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
       if (!username || !password) {
-        alert("请填写完整信息");
+        alert(langPack["msg.fillInfo"]);
         return;
       }
       const result = await CloudDataService.register(username, password);
       if (result.success) {
-        alert(result.msg);
-        window.location.href = "login.html";
+        if (result.msg === "注册成功") {
+          alert(langPack["msg.registerSuccess"]);
+        }
+        window.location.href = "/html/login.html";
       } else {
-        alert(result.msg);
+        if (result.msg === "用户名已存在") {
+          alert(langPack["msg.userExists"]);
+        }
       }
     });
   },
 
   // 退出登录
   logout: async function () {
+    let savedLang = localStorage.getItem("userLanguage") || navigator.language.split("-")[0];
+    const langPack = translations[savedLang];
     await CloudDataService.logout();
-    alert("已退出登录");
-    window.location.href = "./login.html";
+    alert(langPack["msg.logoutSuccess"]);
+    window.location.href = "/html/login.html";
   },
 };
 

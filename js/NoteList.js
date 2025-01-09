@@ -74,9 +74,13 @@ const NoteList = {
       this.bindDragEvents(li);
     });
     // ======= 新增：更新笔记数量 =======
+
+
     const noteCountEl = document.querySelector(".note-count");
     if (noteCountEl) {
-      noteCountEl.textContent = `共${notes.length}条笔记`;
+      const countText = noteCountEl.textContent;
+      const newCountText = countText.replace(/\d+/, notes.length);
+      noteCountEl.textContent = newCountText;
     }
   },
 
@@ -404,7 +408,9 @@ const NoteList = {
                   const url = data.url;
                   navigator.clipboard.writeText(url).then(
                     function () {
-                      alert("链接已生成，已复制到剪切板。");
+                      let savedLang = localStorage.getItem("userLanguage") || navigator.language.split("-")[0];
+                      const langPack = translations[savedLang];
+                      alert(langPack["msg.linkCopied"]);
                     },
                     function (err) {
                       console.error("无法复制到剪切板: ", err);
@@ -429,7 +435,9 @@ const NoteList = {
             const url = data.url;
             navigator.clipboard.writeText(url).then(
               function () {
-                alert("链接已生成，已复制到剪切板。");
+                let savedLang = localStorage.getItem("userLanguage") || navigator.language.split("-")[0];
+                const langPack = translations[savedLang];
+                alert(langPack["msg.linkCopied"]);
               },
               function (err) {
                 console.error("无法复制到剪切板: ", err);
@@ -501,10 +509,13 @@ const NoteList = {
   },
 
   async handleEncrypt() {
+    let savedLang = localStorage.getItem("userLanguage") || navigator.language.split("-")[0];
+    const langPack = translations[savedLang];
+
     // 获取当前 focused 笔记
     const noteItem = document.querySelector(".note-item.focused");
     if (!noteItem) {
-      alert("请先选中一条笔记再进行加密操作。");
+      alert(langPack["msg.selectNoteFirst"]);
       return;
     }
     const noteId = noteItem.getAttribute("data-note-id");
@@ -513,7 +524,7 @@ const NoteList = {
 
     // 如果已经加密了，就不继续
     if (note.isEncrypted) {
-      alert("当前笔记已加密。请解密后再操作。");
+      alert(langPack["msg.noteAlreadyEncrypted"]);
       return;
     }
 
@@ -525,12 +536,13 @@ const NoteList = {
     }
 
     const { pwd1, pwd2 } = result;
+
     if (!pwd1 || !pwd2) {
-      alert("密码不能为空，加密操作取消。");
+      alert(langPack["msg.pwdNotEmpty"]);
       return;
     }
     if (pwd1 !== pwd2) {
-      alert("两次密码不一致，加密操作取消。");
+      alert(langPack["msg.pwdNotMatch"]);
       return;
     }
 
@@ -546,14 +558,16 @@ const NoteList = {
     // 重新渲染笔记列表 (加“🔒”或“🔐”)
     this.applyFiltersAndRender();
 
-    alert("笔记已加密！");
+    alert(langPack["msg.noteEncrypted"]);
   },
 
   async handleDecrypt() {
+    let savedLang = localStorage.getItem("userLanguage") || navigator.language.split("-")[0];
+    const langPack = translations[savedLang];
     // 获取当前 focused 笔记
     const noteItem = document.querySelector(".note-item.focused");
     if (!noteItem) {
-      alert("请先选中一条笔记再进行解密操作。");
+      alert(langPack["msg.selectNoteFirst"]);
       return;
     }
     const noteId = noteItem.getAttribute("data-note-id");
@@ -562,7 +576,7 @@ const NoteList = {
 
     // 如果没加密就不处理
     if (!note.isEncrypted) {
-      alert("当前笔记未加密。");
+      alert(langPack["msg.noteNotEncrypted"]);
       return;
     }
 
@@ -574,7 +588,8 @@ const NoteList = {
     }
 
     if (pwd !== note.password) {
-      alert("密码错误，无法解密。");
+
+      alert(langPack["msg.pwdWrong"]);
       return;
     }
 
@@ -597,7 +612,8 @@ const NoteList = {
     // 重新显示详情（此时已不加密）
     this.renderNoteDetails(note);
 
-    alert("笔记已解密！");
+    alert(langPack["msg.noteDecrypted"]);
+
   },
 
   // 统一调用此方法来“获取当前分类的笔记 -> 搜索过滤 -> 排序 -> render”
@@ -746,6 +762,9 @@ const NoteList = {
   },
 
   showNoteDetails: async function (noteId) {
+    let savedLang = localStorage.getItem("userLanguage") || navigator.language.split("-")[0];
+    const langPack = translations[savedLang];
+
     const note = await CloudDataService.getNoteById(noteId);
     if (!note) return;
 
@@ -772,7 +791,7 @@ const NoteList = {
             }
             break; // 跳出 while 循环
           } else {
-            alert("密码错误，请重新输入或取消。");
+            alert(langPack["msg.pwdWrong"]);
           }
         }
       }

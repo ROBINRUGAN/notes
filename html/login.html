@@ -9,14 +9,37 @@
   <body>
     <div class="auth-container">
       <img class="auth-logo" src="../assets/logo.gif" alt="logo" />
-      <h2>用户登录</h2>
-      <input id="username" type="text" placeholder="输入用户名" />
-      <input id="password" type="password" placeholder="输入密码" />
-      <button id="loginBtn">登录</button>
-      <p>还没有账号？<a class="auth-link" href="./register.html">去注册</a></p>
-    </div>
+      <h2 data-i18n-key="login.userLogin">用户登录</h2>
+      <input
+        data-i18n-placeholder="login.inputUsername"
+        id="username"
+        type="text"
+        placeholder="输入用户名"
+      />
+      <input
+        id="password"
+        data-i18n-placeholder="login.inputPassword"
+        type="password"
+        placeholder="输入密码"
+      />
+      <button id="loginBtn" data-i18n-key="login.loginBtn">登录</button>
+      <p>
+        <span data-i18n-key="login.noAccount"> 还没有账号？ </span>
+        <a
+          class="auth-link"
+          data-i18n-key="login.goRegister"
+          href="../html/register.html"
+          >去注册</a
+        >
+      </p>
 
-    <script src="../js/CloudDataService.js" defer></script>
-    <script src="../js/Auth.js" defer></script>
+      <div class="top-bar">
+        <span>222200314吴荣榜</span>
+        <span>Web程序设计实践项目</span>
+      </div>
+    </div>
   </body>
+  <script src="../js/Translations.js" defer></script>
+  <script src="../js/CloudDataService.js" defer></script>
+  <script src="../js/Auth.js" defer></script>
 </html>

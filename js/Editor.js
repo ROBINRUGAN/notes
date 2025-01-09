@@ -27,6 +27,7 @@ function switchEditorMode(newMode) {
     simplemde = new SimpleMDE({
       element: textarea,
       initialValue: currentNote.content || "", // 修改为 currentNote
+      spellChecker: false,
     });
 
     // 监听编辑

@@ -1,5 +1,36 @@
 const translations = {
   en: {
+    "login.userLogin": "User Login",
+    "login.inputUsername": "Enter username",
+    "login.inputPassword": "Enter password",
+    "login.loginBtn": "Login",
+    "login.noAccount": "No account yet?",
+    "login.goRegister": "Register",
+    "register.userRegister": "User Register",
+    "register.inputUsername": "Enter username",
+    "register.inputPassword": "Enter password",
+    "register.registerBtn": "Register",
+    "register.alreadyHaveAccount": "Already have an account?",
+    "register.goLogin": "Login",
+    "msg.registerSuccess": "Register success",
+    "msg.userExists": "Username already exists",
+    "msg.noteDecrypted": "Note decrypted!",
+    "msg.pwdWrong": "Password wrong",
+    "msg.noteNotEncrypted": "This note is not encrypted.",
+    "msg.noteEncrypted": "This note is already encrypted.",
+    "msg.pwdNotMatch": "Passwords do not match. Operation canceled",
+    "msg.pwdNotEmpty": "Password cannot be empty. Operation canceled",
+    "msg.noteAlreadyEncrypted": "This note is already encrypted. Please decrypt it first",
+    "msg.selectNoteFirst": "Please select a note first",
+    "msg.linkCopied": "Link copied",
+    "msg.logoutSuccess": "Logged out",
+    "msg.fillInfo": "Please fill in all information",
+    "msg.wrongInfo": "Wrong username or password",
+    "msg.loginSuccess": "Login success",
+    "msg.loginFirst": "Please login first",
+    "state.logoutBtn": "Logout",
+    "state.welcome": " Welcome,",
+    "state.logout": "Not logged in",
     "folder.all": "All",
     "folder.uncategorized": "Uncategorized",
     "folder.trash": "Trash",
@@ -44,6 +75,37 @@ const translations = {
   },
 
   zh: {
+    "login.userLogin": "用户登录",
+    "login.inputUsername": "请输入用户名",
+    "login.inputPassword": "请输入密码",
+    "login.loginBtn": "登录",
+    "login.noAccount": "还没有账号？",
+    "login.goRegister": "去注册",
+    "register.userRegister": "用户注册",
+    "register.inputUsername": "请输入用户名",
+    "register.inputPassword": "请输入密码",
+    "register.registerBtn": "注册",
+    "register.alreadyHaveAccount": "已有账号？",
+    "register.goLogin": "去登录",
+    "msg.registerSuccess": "注册成功",
+    "msg.userExists": "用户名已存在",
+    "msg.noteDecrypted": "笔记已解密！",
+    "msg.pwdWrong": "密码错误！",
+    "msg.noteNotEncrypted": "笔记未加密！",
+    "msg.noteEncrypted": "笔记已加密！",
+    "msg.pwdNotMatch": "两次密码不一致，加密操作取消",
+    "msg.pwdNotEmpty": "密码不能为空，加密操作取消",
+    "msg.noteAlreadyEncrypted": "当前笔记已加密。请解密后再操作",
+    "msg.selectNoteFirst": "请先选中一条笔记再进行操作",
+    "msg.linkCopied": "链接已生成，已复制到剪切板",
+    "msg.logoutSuccess": "已退出登录",
+    "msg.fillInfo": "请填写完整信息",
+    "msg.wrongInfo": "用户名或密码错误",
+    "msg.loginSuccess": "登录成功",
+    "msg.loginFirst": "请先登录",
+    "state.logoutBtn": "退出登录",
+    "state.welcome": " 欢迎，",
+    "state.logout": "尚未登录",
     "folder.all": "全部笔记",
     "folder.uncategorized": "未分类",
     "folder.trash": "回收站",
@@ -89,6 +151,37 @@ const translations = {
 
   // ===== 日语（ja） =====
   ja: {
+    "login.userLogin": "ユーザーログイン",
+    "login.inputUsername": "ユーザー名を入力",
+    "login.inputPassword": "パスワードを入力",
+    "login.loginBtn": "ログイン",
+    "login.noAccount": "アカウントをお持ちでないですか？",
+    "login.goRegister": "登録",
+    "register.userRegister": "ユーザー登録",
+    "register.inputUsername": "ユーザー名を入力",
+    "register.inputPassword": "パスワードを入力",
+    "register.registerBtn": "登録",
+    "register.alreadyHaveAccount": "すでにアカウントをお持ちですか？",
+    "register.goLogin": "ログイン",
+    "msg.registerSuccess": "登録成功",
+    "msg.userExists": "ユーザー名はすでに存在します",
+    "msg.noteDecrypted": "ノートが復号化されました！",
+    "msg.pwdWrong": "パスワードが間違っています",
+    "msg.noteNotEncrypted": "このノートはすでに暗号化されていません。",
+    "msg.noteEncrypted": "このノートはすでに",
+    "msg.pwdNotMatch": "パスワードが一致しません。操作をキャンセルしました",
+    "msg.pwdNotEmpty": "パスワードを入力してください",
+    "msg.noteAlreadyEncrypted": "このノートはすでに暗号化されています。操作を行う前に復号化してください",
+    "msg.selectNoteFirst": "ノートを選択してください",
+    "msg.linkCopied": "リンクが生成され、クリップボードにコピーされました",
+    "msg.logoutSuccess": "ログアウトしました",
+    "msg.fillInfo": "すべての情報を入力してください",
+    "msg.wrongInfo": "ユーザー名またはパスワードが間違っています",
+    "msg.loginSuccess": "ログイン成功",
+    "msg.loginFirst": "ログインしてください",
+    "state.logoutBtn": "ログアウト",
+    "state.welcome": " ようこそ、",
+    "state.logout": "ログインしていません",
     "folder.all": "すべてのノート",
     "folder.uncategorized": "未分類",
     "folder.trash": "ゴミ箱",
@@ -134,6 +227,37 @@ const translations = {
 
   // ===== 法语（fr） =====
   fr: {
+    "login.userLogin": "Connexion utilisateur",
+    "login.inputUsername": "Entrez votre nom d'utilisateur",
+    "login.inputPassword": "Entrez votre mot de passe",
+    "login.loginBtn": "Connexion",
+    "login.noAccount": "Pas encore de compte ?",
+    "login.goRegister": "S'inscrire",
+    "register.userRegister": "Inscription utilisateur",
+    "register.inputUsername": "Entrez votre nom d'utilisateur",
+    "register.inputPassword": "Entrez votre mot de passe",
+    "register.registerBtn": "S'inscrire",
+    "register.alreadyHaveAccount": "Déjà un compte ?",
+    "register.goLogin": "Se connecter ",
+    "msg.registerSuccess": "Inscription réussie",
+    "msg.userExists": "Nom d'utilisateur déjà existant",
+    "msg.noteDecrypted": "Note déchiffrée!",
+    "msg.pwdWrong": "Mot de passe incorrect",
+    "msg.noteNotEncrypted": "Cette note n'est pas chiffrée.",
+    "msg.noteEncrypted": "Cette note est déjà chiffrée.",
+    "msg.pwdNotMatch": "Les mots de passe ne correspondent pas. Opération annulée",
+    "msg.pwdNotEmpty": "Le mot de passe ne peut pas être vide. Opération annulée",
+    "msg.noteAlreadyEncrypted": "Cette note est déjà chiffrée. Veuillez la déchiffrer d'abord",
+    "msg.selectNoteFirst": "Veuillez d'abord sélectionner une note",
+    "msg.linkCopied": "Lien copié",
+    "msg.logoutSuccess": "Déconnecté",
+    "msg.fillInfo": "Veuillez remplir toutes les informations",
+    "msg.wrongInfo": "Nom d'utilisateur ou mot de passe incorrect",
+    "msg.loginSuccess": "Connexion réussie",
+    "msg.loginFirst": "Veuillez vous connecter d'abord",
+    "state.logoutBtn": "Déconnexion",
+    "state.welcome": " Bienvenue,",
+    "state.logout": "Déconnecté",
     "folder.all": "Toutes les notes",
     "folder.uncategorized": "Non classé",
     "folder.trash": "Corbeille",
@@ -179,6 +303,8 @@ const translations = {
 };
 
 function applyLanguage(lang) {
+  const notesLength = document.querySelectorAll(".note-item").length;
+  console.log("notesLength", notesLength);
   const langPack = translations[lang] || translations["zh"];
 
   document.querySelectorAll("[data-i18n-key]").forEach((el) => {
@@ -194,13 +320,19 @@ function applyLanguage(lang) {
       el.placeholder = langPack[key];
     }
   });
+
+  const noteCountEl = document.querySelector(".note-count");
+  if (noteCountEl) {
+    const countText = noteCountEl.textContent;
+    const newCountText = countText.replace(/\d+/, notesLength);
+    noteCountEl.textContent = newCountText;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   const langSelect = document.getElementById("lang-select");
 
-  // 从 localStorage 拿之前记录的语言
-  let savedLang = localStorage.getItem("userLanguage") || "zh";
+  let savedLang = localStorage.getItem("userLanguage") || navigator.language.split("-")[0];
   applyLanguage(savedLang);
   // 同步下拉框
   if (langSelect) langSelect.value = savedLang;
