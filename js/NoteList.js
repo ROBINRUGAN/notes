@@ -496,11 +496,7 @@ const NoteList = {
       return;
     }
 
-    // 4) 如果点击的既不是删除/彻底删除/还原 => 显示笔记详情
-    //    (说明点到了 note-item 的其他地方，比如标题p)
-    //    => 不要阻止冒泡 => 继续处理
-    // 先让当前 noteItem focused
-    // 取消其他 .note-item 的 focused
+    // 4) 如果是笔记本身
     const allItems = document.querySelectorAll(".note-item");
     allItems.forEach((i) => i.classList.remove("focused"));
     noteItem.classList.add("focused");
@@ -789,7 +785,7 @@ const NoteList = {
             if (newNoteItem) {
               newNoteItem.classList.add("focused");
             }
-            break; // 跳出 while 循环
+            break;
           } else {
             alert(langPack["msg.pwdWrong"]);
           }
@@ -803,12 +799,10 @@ const NoteList = {
 
   renderNoteDetails(note) {
     // 1) 记录“当前笔记”为全局，这样在 switchEditorMode() 里也能访问
-    currentNote = note; // <-- 关键改动
+    currentNote = note;
 
     const noteDetailsSection = document.querySelector(".note-details-section");
     noteDetailsSection.classList.remove("hidden");
-
-    // ---------- 标题输入处理 ----------
     let noteTitleInput = document.querySelector(".note-title");
 
     // 为避免多次绑定input事件，可以做一次“克隆”替换：
@@ -822,10 +816,8 @@ const NoteList = {
     // 每次点击别的笔记，都要重新监听“input”事件
     noteTitleInput.addEventListener("input", async () => {
       currentNote.title = noteTitleInput.value;
-      currentNote.lastModified = Date.now(); // <-- 关键改动：更新最后修改
+      currentNote.lastModified = Date.now();
       await CloudDataService.updateNote(currentNote);
-
-      // 若要实时刷新“最后修改时间”，可做：
       const lastModifiedEl = document.querySelector(".note-last-modified");
       if (lastModifiedEl) {
         lastModifiedEl.textContent = new Date(
@@ -835,7 +827,7 @@ const NoteList = {
     });
 
     // ---------- 初始化编辑器（默认Markdown） ----------
-    initEditorForNote(currentNote); // <-- 使用 currentNote
+    initEditorForNote(currentNote);
 
     // 如果复选框勾选 => 切到富文本，否则Markdown
     const editModeCheckbox = document.querySelector(".edit-mode-checkbox");

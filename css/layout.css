@@ -70,7 +70,7 @@
 /* 父容器：标题上方布局 */
 .note-details-header {
   display: flex;
-  justify-content: space-between; /* 左右两部分分开 */
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
 }
@@ -91,7 +91,7 @@
 .note-actions {
   display: flex;
   align-items: center;
-  gap: 10px; /* 按钮或元素间隔 */
+  gap: 10px;
 }
 
 .search-bar {

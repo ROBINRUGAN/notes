@@ -6,17 +6,16 @@ const CloudDataService = {
   async getCategories() {
     const res = await fetch("../server/api.php?action=getCategories");
     const data = await res.json();
-    return data; // array
+    return data;
   },
 
   async addCategory(category) {
-    // category: {id, name}
     const res = await fetch("../server/api.php?action=addCategory", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(category),
     });
-    return await res.json(); // {success:true, id:xxx}
+    return await res.json();
   },
 
   async updateCategoryName(categoryId, newName) {
@@ -57,7 +56,7 @@ const CloudDataService = {
 
   async getNotes() {
     const res = await fetch("../server/api.php?action=getNotes");
-    return await res.json(); // array of notes
+    return await res.json();
   },
 
   async addNote(note) {

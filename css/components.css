@@ -159,7 +159,7 @@
   margin-top: 10px;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 或根据需求调整 */
+  justify-content: space-between;
 }
 
 .note-count {
@@ -193,7 +193,7 @@
   border: 1px solid #ddd;
   width: 180px;
   border-radius: 5px;
-  z-index: 999; /* 确保浮在最上方 */
+  z-index: 999;
 }
 
 .sort-dropdown ul {
@@ -240,18 +240,17 @@
 }
 
 /* ============ 编辑模式开关 ============ */
-/* 通过左右文本 + 中间一个开关呈现 */
 .edit-mode-toggle {
   display: flex;
   align-items: center;
-  gap: 8px; /* 左中右之间的间隔 */
+  gap: 8px;
   font-size: 14px;
   color: #333;
 }
 
 .mode-label-left,
 .mode-label-right {
-  min-width: 60px; /* 让文本不会太挤，可根据需要调整 */
+  min-width: 60px;
   text-align: center;
 }
 

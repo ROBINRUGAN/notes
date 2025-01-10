@@ -111,10 +111,8 @@ switch($action) {
 }
 
 /* ------------------ 函数实现区域 ------------------ */
-
-/** 
- * 若没有登录，则返回未授权错误
- */
+ 
+// 若没有登录，则返回未授权错误 
 function ensureLoggedIn() {
   if (!isset($_SESSION['username'])) {
     echo json_encode(['error' => 'not logged in']);
@@ -173,7 +171,6 @@ function logout() {
 }
 
 // ========== 分类相关操作 ==========
-
 function getCategories($pdo) {
   ensureLoggedIn();
   $username = $_SESSION['username'];
@@ -189,7 +186,7 @@ function addCategory($pdo) {
   $username = $_SESSION['username'];
 
   $data = json_decode(file_get_contents('php://input'), true);
-  $id = $data['id'] ?? time();  // 或 uniqid()
+  $id = $data['id'] ?? time(); 
   $name = $data['name'] ?? '未命名';
 
   $stmt = $pdo->prepare("INSERT INTO categories (id, name, username) VALUES (?,?,?)");
@@ -242,7 +239,6 @@ function moveNotesToUncategorized($pdo) {
 }
 
 // ========== 笔记相关操作 ==========
-
 function getNotes($pdo) {
   ensureLoggedIn();
   $username = $_SESSION['username'];
@@ -322,7 +318,6 @@ function deleteNote($pdo) {
 }
 
 // ========== moveNoteToCategory / moveNoteToTrash / restoreNoteFromTrash / permanentlyDeleteNote ==========
-
 function moveNoteToCategory($pdo) {
   ensureLoggedIn();
   $username = $_SESSION['username'];

@@ -40,15 +40,9 @@
       </div>
     </div>
     <div class="app-container">
-      <!-- Sidebar for categories -->
       <aside class="sidebar">
-        <!-- 新增 data-i18n-key -->
         <h2 data-i18n-key="title.noteCategory">笔记分类</h2>
-
-        <!-- 语言切换下拉框 -->
-
         <div class="theme-ctrl">
-          <!-- 新增 data-i18n-key -->
           <select id="lang-select">
             <option value="zh">简体中文</option>
             <option value="en">English</option>
@@ -56,8 +50,6 @@
             <option value="fr">Français</option>
           </select>
           <select id="theme-select">
-            <!-- 下拉框的文本也可能需要翻译 -->
-            <!-- 可以先写中文，然后用 data-i18n-key，如果想要更进一步，可动态生成 option -->
             <option
               value="theme-blue"
               selected
@@ -117,34 +109,26 @@
         </button>
       </aside>
 
-      <!-- Note List Section -->
       <section class="note-list-section">
         <header class="search-bar">
-          <!-- 新增 data-i18n-placeholder -->
           <input
             type="text"
             data-i18n-placeholder="placeholder.search"
             placeholder="搜索笔记..."
           />
-          <!-- “+”号一般不翻译，但你可以改成 data-i18n-key="btn.addNote" 并用文字 -->
           <button class="add-note-btn" data-i18n-key="btn.addNoteSymbol">
             +
           </button>
         </header>
 
-        <!-- 新增：统计和排序容器 -->
         <div class="note-info-bar">
-          <!-- 新增 data-i18n-key -->
           <span class="note-count" data-i18n-key="text.noteCount"
             >共0条笔记</span
           >
           <div class="sort-dropdown-container">
-            <!-- 新增 data-i18n-key -->
             <button class="sort-btn" data-i18n-key="btn.sort">排序 ▾</button>
-            <!-- 下拉框，默认隐藏 -->
             <div class="sort-dropdown hidden">
               <ul>
-                <!-- 这几个也要翻译 -->
                 <li
                   data-sort="createTime-asc"
                   data-i18n-key="sort.createTimeAsc"
@@ -183,12 +167,9 @@
         <ul class="notes"></ul>
       </section>
 
-      <!-- Note Details Section -->
       <section class="note-details-section hidden">
-        <!-- 标题上方：时间信息 + 按钮操作区 -->
         <div class="note-details-header">
           <div class="note-dates">
-            <!-- 新增 data-i18n-key -->
             <p data-i18n-key="label.createTime">
               <span data-i18n-key="label.createTimePrefix">创建时间：</span>
               <span class="note-create-time"></span>
@@ -200,7 +181,6 @@
           </div>
 
           <div class="note-actions">
-            <!-- 加密/解密按钮 -->
             <button class="encrypt-toggle-btn" data-i18n-key="btn.encrypt">
               🔒 加密
             </button>
@@ -208,9 +188,7 @@
               🔑 解密
             </button>
 
-            <!-- 编辑模式开关：Markdown编辑 | 开关 | 富文本编辑 -->
             <div class="edit-mode-toggle">
-              <!-- 新增 data-i18n-key -->
               <span class="mode-label-left" data-i18n-key="text.markdownEdit"
                 >Markdown编辑</span
               >
@@ -218,15 +196,12 @@
                 <input type="checkbox" class="edit-mode-checkbox" />
                 <span class="switch"></span>
               </label>
-              <!-- 新增 data-i18n-key -->
               <span class="mode-label-right" data-i18n-key="text.richTextEdit"
                 >富文本编辑</span
               >
             </div>
 
-            <!-- 导出按钮 + 下拉菜单 -->
             <div class="export-dropdown-container">
-              <!-- 新增 data-i18n-key -->
               <button class="export-btn" data-i18n-key="btn.export">
                 分享 ▾
               </button>
@@ -260,7 +235,6 @@
           "
         />
 
-        <!-- 新增 data-i18n-placeholder 若你想翻译默认 "笔记标题" -->
         <input class="note-title" value="笔记标题" />
         <hr
           style="
@@ -276,13 +250,11 @@
         </div>
       </section>
 
-      <!-- 自定义的密码输入对话框（初始隐藏） -->
       <div class="password-modal hidden-password-modal">
         <div class="password-modal-content">
           <h3 data-i18n-key="modal.enterPwd">请输入笔记密码</h3>
           <input type="password" class="password-input" />
           <div class="modal-buttons">
-            <!-- 新增 data-i18n-key -->
             <button class="password-confirm-btn" data-i18n-key="btn.confirm">
               确认
             </button>
@@ -293,7 +265,6 @@
         </div>
       </div>
 
-      <!-- 设置加密密码的对话框（初始隐藏） -->
       <div class="set-password-modal hidden-password-modal">
         <div class="set-password-modal-content">
           <h3 data-i18n-key="modal.setPwd">设置密码</h3>
@@ -320,7 +291,6 @@
         </div>
       </div>
 
-      <!-- 解密对话框 -->
       <div class="decrypt-modal hidden-password-modal">
         <div class="decrypt-modal-content">
           <h3 data-i18n-key="modal.decrypt">解密操作</h3>
